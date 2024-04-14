@@ -1,26 +1,24 @@
 import * as express from "express";
 import { Request, Response } from "express";
-import { User } from "./entity/user.entity";
-import { myDataSource } from "../app-data-source";
+import { myDataSource } from "./db/datasource/app-data-source";
+import { authRouter } from "./routes/authRoutes";
+const cors = require("cors");
 
+const bodyParser = require("body-parser");
 //establish database connection
-myDataSource
-  .initialize()
-  .then(() => {
-    console.log("Datasource has been initialized!");
-  })
-  .catch((err) => {
-    console.log("Error during datasouce initilization: ", err);
-  });
 
 const app = express();
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(bodyParser.json());
+
+//enabling cross origin resource sharing
+app.use(cors());
+
 app.use(express.json());
 
-app.get("/users", function (req: Request, res: Response) {
-  res.send("working...");
-});
+app.use("/auth", authRouter);
 
-app.listen(3000, () => {
-  console.log("listning on port 3000");
-});
+export default app;
