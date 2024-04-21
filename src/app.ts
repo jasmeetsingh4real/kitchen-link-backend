@@ -14,8 +14,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
-//enabling cross origin resource sharing
-app.use(cors());
+// enabling cross origin resource sharing
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:3000",
+    exposedHeaders: ["Set-cookie"],
+  })
+);
 
 app.use(express.json());
 

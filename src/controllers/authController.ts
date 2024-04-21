@@ -3,47 +3,51 @@ import { createUserSchema, loginUserSchema } from "../schemas/UsersSchema";
 import { myDataSource } from "../db/datasource/app-data-source";
 import { KitchenLinkUsersEntity } from "../entity/kitchenLinkUsers.entity";
 import { AuthService } from "../services/authService";
+import { EnumUserRole } from "../types/AuthTypes";
 
 export class AuthController {
   static createUser = async (req, res) => {
     try {
-      const usersRepo = myDataSource.getRepository(KitchenLinkUsersEntity);
-      //verify data
-      const verifiedUserData = createUserSchema.parse(req.body);
-      const existingUserDetails = await usersRepo.findOne({
-        where: {
-          email: verifiedUserData.email,
-        },
-      });
-      //verify email
-      if (existingUserDetails) {
-        throw new Error(
-          "Email already exists, Please choose a different email to signin."
-        );
-      }
-      const hashPassword: string = await AuthService.encryptPassword(
-        verifiedUserData.password
+      const transactionResponse = await myDataSource.manager.transaction(
+        async (myDataSourceTxn) => {
+          const usersRepo = myDataSourceTxn.getRepository(
+            KitchenLinkUsersEntity
+          );
+          //verify data
+          const verifiedUserData = createUserSchema.parse(req.body.userDetails);
+          const existingUserDetails = await usersRepo.findOne({
+            where: {
+              email: verifiedUserData.email,
+            },
+          });
+          //verify email
+          if (existingUserDetails) {
+            throw new Error(
+              "Email already exists, Please choose a different email to signin."
+            );
+          }
+          const hashPassword: string = await AuthService.encryptPassword(
+            verifiedUserData.password
+          );
+
+          // save user data
+          const saveUserRes = await usersRepo.save({
+            ...verifiedUserData,
+            password: hashPassword,
+          });
+          if (!saveUserRes) {
+            throw new Error("Something went wrong while sigining in.");
+          }
+
+          return res.json({
+            data: saveUserRes,
+            success: true,
+            errorMessage: null,
+          });
+        }
       );
 
-      // save user data
-      const saveUserRes = await usersRepo.save({
-        ...verifiedUserData,
-        password: hashPassword,
-      });
-      if (!saveUserRes) {
-        throw new Error("Something went wrong while sigining in.");
-      }
-
-      //create token
-      const token = AuthService.getAuthToken(verifiedUserData);
-
-      res.cookie(token);
-
-      return res.json({
-        data: saveUserRes,
-        success: true,
-        errorMessage: null,
-      });
+      return transactionResponse;
     } catch (error: any) {
       if (error instanceof ZodError) {
         // Handle ZodError
@@ -80,9 +84,13 @@ export class AuthController {
       if (!isPasswordValid) {
         throw new Error("Incorrect password!");
       }
-
-      const token = AuthService.getAuthToken(verifiedUserData);
-      res.cookie(token);
+      const isSeller = userDetails.role === EnumUserRole.SELLER;
+      const token = AuthService.getAuthToken(verifiedUserData, isSeller);
+      if (isSeller) {
+        res.cookie("sellerAuthToken", token);
+      } else {
+        res.cookie("authToken", token);
+      }
       return res.json({
         data: "User verified!",
         success: true,
@@ -106,8 +114,11 @@ export class AuthController {
   };
   static verifyAuthToken = async (req, res) => {
     try {
-      const { token } = req.body;
-      const verifiedTokenRes = await AuthService.verifyAuthToken(token);
+      const { token, isSeller } = req.body;
+      const verifiedTokenRes = await AuthService.verifyAuthToken(
+        token,
+        isSeller
+      );
       if (!verifiedTokenRes) {
         throw new Error("Invalid Auth-Token!");
       }
