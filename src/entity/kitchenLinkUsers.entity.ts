@@ -3,8 +3,10 @@ import { EnumUserRole, EnumUserStatus } from "../types/AuthTypes";
 
 @Entity({ name: "kitchenlinkusers" })
 export class KitchenLinkUsersEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid", {
+    name: "id",
+  })
+  id: string;
 
   @Column({ type: "enum", enum: EnumUserRole })
   role: string;

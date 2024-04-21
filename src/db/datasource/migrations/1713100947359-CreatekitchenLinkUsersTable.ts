@@ -16,10 +16,11 @@ export class CreatekitchenLinkUsersTable1713100947359
         columns: [
           {
             name: "id",
-            type: "int",
+            type: "varchar",
             isPrimary: true,
-            generationStrategy: "increment",
+            generationStrategy: "uuid",
             isGenerated: true,
+            isUnique: true,
           },
           {
             name: "role",
