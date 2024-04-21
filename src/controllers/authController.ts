@@ -92,7 +92,7 @@ export class AuthController {
         res.cookie("authToken", token);
       }
       return res.json({
-        data: "User verified!",
+        data: { role: userDetails.role },
         success: true,
         errorMessage: null,
       });
