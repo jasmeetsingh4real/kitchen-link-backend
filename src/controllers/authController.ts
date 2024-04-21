@@ -91,8 +91,9 @@ export class AuthController {
       } else {
         res.cookie("authToken", token);
       }
+      //password is encrypted but still not sending to frontend.. #gang_shit
       return res.json({
-        data: { role: userDetails.role },
+        data: { ...userDetails, password: "" },
         success: true,
         errorMessage: null,
       });
