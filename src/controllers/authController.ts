@@ -85,7 +85,10 @@ export class AuthController {
         throw new Error("Incorrect password!");
       }
       const isSeller = userDetails.role === EnumUserRole.SELLER;
-      const token = AuthService.getAuthToken(verifiedUserData, isSeller);
+      const token = AuthService.getAuthToken(
+        { ...verifiedUserData, id: userDetails.id },
+        isSeller
+      );
       if (isSeller) {
         res.cookie("sellerAuthToken", token);
       } else {

@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { EnumRestaurantStatus } from "../types/RestaurentsTypes";
 
-@Entity()
+@Entity({ name: "restaurants" })
 export class RestaurantEntity {
   @PrimaryGeneratedColumn()
   id: number;

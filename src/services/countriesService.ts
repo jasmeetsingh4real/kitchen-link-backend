@@ -82,4 +82,25 @@ export class CountriesService {
       throw new Error(apiRes.data.errorMessage || "Something went wrong");
     }
   };
+  static verifyRestaurantLoc = async (
+    countryId: number,
+    stateId: number,
+    cityId: number
+  ) => {
+    const citiesRepo = myDataSource.getRepository(CitiesEntity);
+
+    const cityDetails = await citiesRepo.findOne({
+      where: {
+        id: cityId,
+      },
+    });
+
+    if (
+      !cityDetails ||
+      countryId !== cityDetails.countryId ||
+      stateId !== cityDetails.stateId
+    ) {
+      throw new Error("Invalid location Data");
+    }
+  };
 }
