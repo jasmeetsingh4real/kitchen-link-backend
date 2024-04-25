@@ -2,6 +2,7 @@
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.21",
+    "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -37,7 +38,6 @@
     "typeorm": "typeorm-ts-node-commonjs",
     "typeorm:migrate": "npm run typeorm migration:run -d ./src/DB/datasource"
   },
-
   "author": "",
   "license": "ISC",
   "keywords": []

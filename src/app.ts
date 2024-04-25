@@ -2,6 +2,7 @@ import * as express from "express";
 import { Request, Response } from "express";
 import { myDataSource } from "./db/datasource/app-data-source";
 import { authRouter } from "./routes/authRoutes";
+import { commonRouter } from "./routes/commonRoutes";
 const cors = require("cors");
 
 const bodyParser = require("body-parser");
@@ -25,6 +26,6 @@ app.use(
 
 app.use(express.json());
 
+app.use("/common", commonRouter);
 app.use("/auth", authRouter);
-
 export default app;
