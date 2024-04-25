@@ -36,8 +36,7 @@ export class CountriesService {
   };
 
   static getStatesFromApi = async (countryCode: string) => {
-    const security_key =
-      "ZlJtbVd5MEEwM0xWdTNKeGsxYUt5dk5ER3luakxOWmFrVlVSME1acg==";
+    const security_key = process.env.X_CSCAPI_KEY;
     const apiRes = await axios.get(
       `${process.env.COUNTRIES_API_URL}/countries/${countryCode}/states`,
       {
