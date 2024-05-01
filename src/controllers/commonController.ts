@@ -11,7 +11,7 @@ export class CommonController {
       if (keyword) {
         const countries = await CountriesService.getCountriesByName(keyword);
         return res.json({
-          data: countries,
+          result: countries,
           success: true,
           errorMessage: null,
         });
@@ -51,20 +51,20 @@ export class CommonController {
         statesRepo.save(statesFromAPI);
 
         return res.json({
-          data: statesFromAPI,
+          result: statesFromAPI,
           success: true,
           errorMessage: null,
         });
       }
 
       return res.json({
-        data: statesInDb,
+        result: statesInDb,
         success: true,
         errorMessage: null,
       });
     } catch (error) {
       return res.json({
-        data: null,
+        result: null,
         success: false,
         errorMessage: error.message || "something went wrong",
       });
@@ -95,20 +95,20 @@ export class CommonController {
           citiesRepo.save(citiesFromApi);
 
           return res.json({
-            data: citiesFromApi,
+            result: citiesFromApi,
             success: true,
             errorMessage: null,
           });
         }
       }
       return res.json({
-        data: citiesInDB,
+        result: citiesInDB,
         success: true,
         errorMessage: null,
       });
     } catch (err) {
       return res.json({
-        data: null,
+        result: null,
         success: false,
         errorMessage: err.message || "something went wrong",
       });
