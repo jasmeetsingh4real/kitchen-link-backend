@@ -4,6 +4,7 @@ import { myDataSource } from "../db/datasource/app-data-source";
 import { KitchenLinkUsersEntity } from "../entity/kitchenLinkUsers.entity";
 import { AuthService } from "../services/authService";
 import { EnumUserRole } from "../types/AuthTypes";
+import { RestaurantEntity } from "../entity/restaurant.entity";
 
 export class AuthController {
   static createUser = async (req, res) => {
@@ -126,14 +127,28 @@ export class AuthController {
       if (!verifiedTokenRes) {
         throw new Error("Invalid Auth-Token!");
       }
+      if (isSeller) {
+        const restaurantRepo = myDataSource.getRepository(RestaurantEntity);
+        const userRestaurantDetails = await restaurantRepo.findOne({
+          where: {
+            ownerId: verifiedTokenRes.id,
+          },
+        });
+        return res.json({
+          result: userRestaurantDetails,
+          success: true,
+          errorMessage: null,
+        });
+      }
+
       return res.json({
-        data: "Token verified!",
+        result: "Token verified!",
         success: true,
         errorMessage: null,
       });
     } catch (error) {
       return res.json({
-        data: null,
+        result: null,
         success: false,
         errorMessage: error.message || "something went wrong",
       });

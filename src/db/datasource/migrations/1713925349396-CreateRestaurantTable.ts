@@ -22,6 +22,7 @@ export class CreateRestaurantTable1713925349396 implements MigrationInterface {
           {
             name: "ownerId",
             type: "varchar",
+            isUnique: true,
           },
           {
             name: "openingTime",

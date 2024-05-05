@@ -4,8 +4,8 @@ import { EnumRestaurantStatus } from "../types/RestaurentsTypes";
 export const restaurantSchema = z.object({
   ownerId: z.string().min(1),
   restaurantName: z.string().min(1),
-  openingTime: z.date(),
-  closingTime: z.date(),
+  openingTime: z.string().min(1),
+  closingTime: z.string().min(1),
   restaurantEmail: z.string().email(),
   restaurantContact: z.string().min(1),
   stateId: z.number(),
