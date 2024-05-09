@@ -135,7 +135,7 @@ export class AuthController {
           },
         });
         return res.json({
-          result: userRestaurantDetails,
+          result: userRestaurantDetails || null,
           success: true,
           errorMessage: null,
         });
