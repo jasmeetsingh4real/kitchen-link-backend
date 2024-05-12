@@ -4,7 +4,6 @@ import {
   Table,
   TableExclusion,
 } from "typeorm";
-import { EnumUserRole, EnumUserStatus } from "../../../types/AuthTypes";
 
 export class CreatekitchenLinkUsersTable1713100947359
   implements MigrationInterface

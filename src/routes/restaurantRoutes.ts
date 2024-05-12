@@ -29,4 +29,8 @@ restaurantRouter.post(
   "/getRestaurantImages",
   RestaurantController.getRestaurantImages
 );
+restaurantRouter.post(
+  "/getRestaurantLocation",
+  RestaurantController.getRestaurantLocation
+);
 restaurantRouter.post("/deleteImage", RestaurantController.deleteImage);

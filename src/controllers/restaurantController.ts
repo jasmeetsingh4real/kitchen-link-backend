@@ -4,6 +4,7 @@ import { RestaurantEntity } from "../entity/restaurant.entity";
 import { restaurantSchema } from "../schemas/RestaurantSchemas";
 import { CountriesService } from "../services/countriesService";
 import { RestaurantImagesEntity } from "../entity/restaurantImages.entity";
+import { RestaurantService } from "../services/restaurantService";
 const fs = require("fs");
 const path = require("path");
 export class RestaurantController {
@@ -48,6 +49,12 @@ export class RestaurantController {
       if (!req.file) {
         return res.status(400).send("No files were uploaded.");
       }
+      // const response = await RestaurantService.uploadRestaurantImage({
+      //   fileName: req.file.filename,
+      //   ownerId: req.userId,
+      //   path: req.file.path,
+      //   targetPath: process.env.DEV_RESTAURANT_IMAGES_TARGET_PATH,
+      // });
       const restaurantImagesRepo = myDataSource.getRepository(
         RestaurantImagesEntity
       );
@@ -70,6 +77,9 @@ export class RestaurantController {
           if (!savedImgRes) {
             throw new Error("Error saving the file");
           }
+          // if (!response) {
+          //   throw new Error("Something went wrong");
+          // }
           res.json({
             result: savedImgRes,
             success: true,
@@ -134,6 +144,34 @@ export class RestaurantController {
       });
       return res.json({
         result: "image deleted",
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "Something went wrong",
+      });
+    }
+  };
+
+  static getRestaurantLocation = async (req, res) => {
+    try {
+      const { stateId, countryId, cityId } = req.body;
+      if (!stateId || !countryId || !cityId) {
+        throw new Error("Please provide restaurant id");
+      }
+      const RestaurantLocation = await RestaurantService.getRestaurantLocation({
+        stateId,
+        countryId,
+        cityId,
+      });
+      if (!RestaurantLocation) {
+        throw new Error("Restaurant loc not found");
+      }
+      return res.json({
+        result: RestaurantLocation,
         success: true,
         errorMessage: null,
       });
