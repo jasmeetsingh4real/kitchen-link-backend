@@ -12,3 +12,4 @@ commonRouter.post(
   "/getCitiesByStateCode",
   CommonController.getCitiesByStateCode
 );
+commonRouter.post("/getCountryById", CommonController.getCountryById);

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { EnumRestaurantStatus } from "../types/RestaurentsTypes";
 
 export const restaurantSchema = z.object({
+  id: z.number().optional(),
   ownerId: z.string().min(1),
   restaurantName: z.string().min(1),
   openingTime: z.string().min(1),

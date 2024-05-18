@@ -12,10 +12,14 @@ export class RestaurantEntity {
   @Column()
   ownerId: string;
 
-  @Column()
+  @Column({
+    type: "timestamp",
+  })
   openingTime: Date;
 
-  @Column()
+  @Column({
+    type: "timestamp",
+  })
   closingTime: Date;
 
   @Column()

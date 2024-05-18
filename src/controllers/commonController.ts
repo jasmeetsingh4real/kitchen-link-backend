@@ -1,5 +1,6 @@
 import { myDataSource } from "../db/datasource/app-data-source";
 import { CitiesEntity } from "../entity/cities.entity";
+import { CountriesEntity } from "../entity/countries.entity";
 import { StatesEntity } from "../entity/states.entity";
 import { CountriesService } from "../services/countriesService";
 import { TState } from "../types/RestaurentsTypes";
@@ -32,9 +33,23 @@ export class CommonController {
 
   static getStatesByCountryCode = async (req, res) => {
     try {
-      const { countryCode, countryId } = req.body;
-      if (!countryCode || !countryId) {
+      let countryCode = req.body.countryCode;
+      const { countryId } = req.body;
+      const countriesRepo = myDataSource.getRepository(CountriesEntity);
+      if (!countryId) {
         throw new Error("Invalid Request");
+      }
+
+      if (!countryCode) {
+        const contryDetails = await countriesRepo.findOne({
+          where: {
+            id: countryId,
+          },
+        });
+        countryCode = contryDetails.iso2;
+      }
+      if (!countryCode) {
+        throw new Error("Country code not found");
       }
       const statesRepo = myDataSource.getRepository(StatesEntity);
       const statesInDb = await CountriesService.getStatesByCountryCode(
@@ -74,8 +89,28 @@ export class CommonController {
   static getCitiesByStateCode = async (req, res) => {
     try {
       const citiesRepo = myDataSource.getRepository(CitiesEntity);
-      const { stateCode, countryCode, stateId, countryId } = req.body;
-      if (!stateCode || !countryCode || !stateId || !countryId) {
+      let { stateCode, countryCode, stateId, countryId } = req.body;
+
+      if (!stateId || !countryId) {
+        throw new Error("Invalid Request");
+      }
+      const statedRepo = myDataSource.getRepository(StatesEntity);
+      if (!stateCode) {
+        const stateDetails = await statedRepo.findOne({
+          where: {
+            id: stateId,
+          },
+        });
+        stateCode = stateDetails.iso2;
+      }
+      const countryRepo = myDataSource.getRepository(CountriesEntity);
+      if (!countryCode) {
+        const countryDetails = await countryRepo.findOne({
+          where: { id: countryId },
+        });
+        countryCode = countryDetails.iso2;
+      }
+      if (!stateCode || !countryCode) {
         throw new Error("Invalid Request");
       }
       const citiesInDB = await CountriesService.getCitiesByStateCode(stateCode);
@@ -103,6 +138,34 @@ export class CommonController {
       }
       return res.json({
         result: citiesInDB,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
+
+  static getCountryById = async (req, res) => {
+    try {
+      const countryRepo = myDataSource.getRepository(CountriesEntity);
+      const country = await countryRepo.findOne({
+        where: {
+          id: req.body.id,
+        },
+      });
+      if (!country) {
+        throw new Error("Country not found");
+      }
+      return res.json({
+        result: {
+          label: country.name,
+          value: { id: country.id, code: country.iso2 },
+        },
         success: true,
         errorMessage: null,
       });

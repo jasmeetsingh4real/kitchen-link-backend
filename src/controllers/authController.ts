@@ -5,6 +5,7 @@ import { KitchenLinkUsersEntity } from "../entity/kitchenLinkUsers.entity";
 import { AuthService } from "../services/authService";
 import { EnumUserRole } from "../types/AuthTypes";
 import { RestaurantEntity } from "../entity/restaurant.entity";
+import { RestaurantImagesEntity } from "../entity/restaurantImages.entity";
 
 export class AuthController {
   static createUser = async (req, res) => {
@@ -70,6 +71,9 @@ export class AuthController {
     try {
       const verifiedUserData = loginUserSchema.parse(req.body);
       const usersRepo = myDataSource.getRepository(KitchenLinkUsersEntity);
+      const restaurantImagesRepo = myDataSource.getRepository(
+        RestaurantImagesEntity
+      );
       const userDetails = await usersRepo.findOne({
         where: {
           email: verifiedUserData.email,
@@ -90,14 +94,23 @@ export class AuthController {
         { ...verifiedUserData, id: userDetails.id },
         isSeller
       );
+      let imagesSaved = false;
       if (isSeller) {
+        const savedImages = await restaurantImagesRepo.find({
+          where: {
+            ownerId: userDetails.id,
+          },
+        });
+        if (savedImages.length > 0) {
+          imagesSaved = true;
+        }
         res.cookie("sellerAuthToken", token);
       } else {
         res.cookie("authToken", token);
       }
       //password is encrypted but still not sending to frontend.. #gang_shit
       return res.json({
-        data: { ...userDetails, password: "" },
+        data: { ...userDetails, password: "", imagesSaved },
         success: true,
         errorMessage: null,
       });

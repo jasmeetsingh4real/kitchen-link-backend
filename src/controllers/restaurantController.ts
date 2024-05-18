@@ -15,11 +15,23 @@ export class RestaurantController {
         ...req.body,
         ownerId: req.userId,
       });
+
       await CountriesService.verifyRestaurantLoc(
         verifiedResData.countryId,
         verifiedResData.stateId,
         verifiedResData.cityId
       );
+      if (req.body.id) {
+        await restaurantRepo.update({ id: req.body.id }, verifiedResData);
+        const updateResponse = await restaurantRepo.findOne({
+          where: { id: req.body.id },
+        });
+        return res.json({
+          data: updateResponse,
+          success: true,
+          errorMessage: null,
+        });
+      }
       const response = await restaurantRepo.save(verifiedResData);
       //save images in images table
       return res.json({

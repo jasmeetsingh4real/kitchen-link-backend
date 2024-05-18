@@ -26,11 +26,11 @@ export class CreateRestaurantTable1713925349396 implements MigrationInterface {
           },
           {
             name: "openingTime",
-            type: "date",
+            type: "timestamp",
           },
           {
             name: "closingTime",
-            type: "date",
+            type: "timestamp",
           },
           {
             name: "restaurantEmail",

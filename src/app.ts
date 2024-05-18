@@ -1,5 +1,4 @@
 import * as express from "express";
-import { Request, Response } from "express";
 import { myDataSource } from "./db/datasource/app-data-source";
 import { authRouter } from "./routes/authRoutes";
 import { commonRouter } from "./routes/commonRoutes";
