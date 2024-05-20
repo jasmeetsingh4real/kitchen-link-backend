@@ -34,3 +34,10 @@ restaurantRouter.post(
   RestaurantController.getRestaurantLocation
 );
 restaurantRouter.post("/deleteImage", RestaurantController.deleteImage);
+
+restaurantRouter.post(
+  "/saveOrEditFoodItem",
+  RestaurantController.saveOrEditFoodItem
+);
+
+restaurantRouter.get("/getAllFoodItems", RestaurantController.getAllFoodItems);

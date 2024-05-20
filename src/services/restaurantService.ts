@@ -1,8 +1,10 @@
 import { myDataSource } from "../db/datasource/app-data-source";
 import { CitiesEntity } from "../entity/cities.entity";
 import { CountriesEntity } from "../entity/countries.entity";
-import { RestaurantImagesEntity } from "../entity/restaurantImages.entity";
+import { AllImagesEntity } from "../entity/allImages.entity";
 import { StatesEntity } from "../entity/states.entity";
+import { TFoodItem } from "../schemas/RestaurantSchemas";
+import { FoodItemsEntity } from "../entity/foodItems.entity";
 const fs = require("fs");
 export class RestaurantService {
   static uploadRestaurantImage = async (imageDetails: {
@@ -11,9 +13,7 @@ export class RestaurantService {
     path: string;
     ownerId: string;
   }) => {
-    const restaurantImagesRepo = myDataSource.getRepository(
-      RestaurantImagesEntity
-    );
+    const allImagesRepo = myDataSource.getRepository(AllImagesEntity);
     const imagePath = imageDetails.path + imageDetails.fileName;
     // Move file
     return fs.rename(imageDetails.targetPath, imagePath, async (err) => {
@@ -22,7 +22,7 @@ export class RestaurantService {
         throw new Error("Error saving the file");
       }
       try {
-        const savedImgRes = await restaurantImagesRepo.save({
+        const savedImgRes = await allImagesRepo.save({
           fileName: imageDetails.fileName,
           ownerId: imageDetails.ownerId,
         });
@@ -55,5 +55,27 @@ export class RestaurantService {
     });
 
     return `${restaurantCity.name}, ${restaurantState.name}, ${restaurantCountry.name}`;
+  };
+
+  static saveOrEditFoodItem = async (foodItemData: TFoodItem) => {
+    const foodItemsRepo = myDataSource.getRepository(FoodItemsEntity);
+    if (!foodItemData.id) {
+      await foodItemsRepo.save(foodItemData);
+    } else {
+      await foodItemsRepo.update(
+        {
+          id: foodItemData.id,
+        },
+        foodItemData
+      );
+    }
+  };
+  static getAllFoodItemsByRestaurantId = async (restaurantId: number) => {
+    const foodItemsRepo = myDataSource.getRepository(FoodItemsEntity);
+    return await foodItemsRepo.find({
+      where: {
+        restaurantId,
+      },
+    });
   };
 }

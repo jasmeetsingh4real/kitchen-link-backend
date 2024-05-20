@@ -46,3 +46,27 @@ export interface TCity {
   latitude: string;
   longitude: string;
 }
+
+export enum EnumFoodItemsType {
+  APPETIZER = "Appetizer",
+  MAIN_COURSE = "Main Course",
+  SIDE_DISH = "Side Dish",
+  DESSERT = "Dessert",
+  BEVERAGE = "Beverage",
+  SALAD = "Salad",
+  SOUP = "Soup",
+  SNACK = "Snack",
+  BREAKFAST = "Breakfast",
+  BRUNCH = "Brunch",
+}
+
+export enum EnumDietryInfo {
+  VEG = "veg",
+  NON_VEG = "non_veg",
+}
+
+export enum EnumImageType {
+  RESTAURANT_IMAGE = "restaurant_image",
+  FOOD_ITEM_IMAGE = "food_item_image",
+  FOOD_ITEM_OPTION_IMAGE = "food_item_option_image",
+}

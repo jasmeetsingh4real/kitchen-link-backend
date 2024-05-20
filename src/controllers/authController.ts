@@ -5,7 +5,7 @@ import { KitchenLinkUsersEntity } from "../entity/kitchenLinkUsers.entity";
 import { AuthService } from "../services/authService";
 import { EnumUserRole } from "../types/AuthTypes";
 import { RestaurantEntity } from "../entity/restaurant.entity";
-import { RestaurantImagesEntity } from "../entity/restaurantImages.entity";
+import { AllImagesEntity } from "../entity/allImages.entity";
 
 export class AuthController {
   static createUser = async (req, res) => {
@@ -71,9 +71,7 @@ export class AuthController {
     try {
       const verifiedUserData = loginUserSchema.parse(req.body);
       const usersRepo = myDataSource.getRepository(KitchenLinkUsersEntity);
-      const restaurantImagesRepo = myDataSource.getRepository(
-        RestaurantImagesEntity
-      );
+      const allImagesRepo = myDataSource.getRepository(AllImagesEntity);
       const userDetails = await usersRepo.findOne({
         where: {
           email: verifiedUserData.email,
@@ -96,7 +94,7 @@ export class AuthController {
       );
       let imagesSaved = false;
       if (isSeller) {
-        const savedImages = await restaurantImagesRepo.find({
+        const savedImages = await allImagesRepo.find({
           where: {
             ownerId: userDetails.id,
           },

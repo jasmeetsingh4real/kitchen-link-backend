@@ -6,7 +6,7 @@ export class CreateRestaurantImagesTable1715115049544
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: "restaurant_images",
+        name: "all_images",
         columns: [
           {
             name: "id",
@@ -29,6 +29,6 @@ export class CreateRestaurantImagesTable1715115049544
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable("restaurant_images");
+    await queryRunner.dropTable("all_images");
   }
 }

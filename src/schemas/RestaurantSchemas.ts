@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { EnumRestaurantStatus } from "../types/RestaurentsTypes";
+import {
+  EnumDietryInfo,
+  EnumRestaurantStatus,
+} from "../types/RestaurentsTypes";
 
 export const restaurantSchema = z.object({
   id: z.number().optional(),
@@ -17,3 +20,16 @@ export const restaurantSchema = z.object({
 });
 
 export type TRestaurant = z.infer<typeof restaurantSchema>;
+
+export const foodItemSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  category: z.string().min(1),
+  price: z.number().positive(),
+  ingredients: z.string().optional(),
+  dietryInfo: z.nativeEnum(EnumDietryInfo),
+  foodItemSlugId: z.number().optional(),
+  restaurantId: z.number(),
+});
+export type TFoodItem = z.infer<typeof foodItemSchema>;

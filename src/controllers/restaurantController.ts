@@ -1,10 +1,12 @@
 import { ZodError } from "zod";
 import { myDataSource } from "../db/datasource/app-data-source";
 import { RestaurantEntity } from "../entity/restaurant.entity";
-import { restaurantSchema } from "../schemas/RestaurantSchemas";
+import { foodItemSchema, restaurantSchema } from "../schemas/RestaurantSchemas";
 import { CountriesService } from "../services/countriesService";
-import { RestaurantImagesEntity } from "../entity/restaurantImages.entity";
+import { AllImagesEntity } from "../entity/allImages.entity";
 import { RestaurantService } from "../services/restaurantService";
+import { EnumImageType } from "../types/RestaurentsTypes";
+import { ImageService } from "../services/imageService";
 const fs = require("fs");
 const path = require("path");
 export class RestaurantController {
@@ -61,47 +63,22 @@ export class RestaurantController {
       if (!req.file) {
         return res.status(400).send("No files were uploaded.");
       }
-      // const response = await RestaurantService.uploadRestaurantImage({
-      //   fileName: req.file.filename,
-      //   ownerId: req.userId,
-      //   path: req.file.path,
-      //   targetPath: process.env.DEV_RESTAURANT_IMAGES_TARGET_PATH,
-      // });
-      const restaurantImagesRepo = myDataSource.getRepository(
-        RestaurantImagesEntity
-      );
-      const tempPath = req.file.path;
 
-      const targetPath =
-        process.env.DEV_RESTAURANT_IMAGES_TARGET_PATH + req.file.filename;
+      const targetPath = process.env.DEV_RESTAURANT_IMAGES_TARGET_PATH;
 
-      // Move file
-      fs.rename(tempPath, targetPath, async (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).send("Error saving the file");
-        }
-        try {
-          const savedImgRes = await restaurantImagesRepo.save({
-            fileName: req.file.filename,
-            ownerId: req.userId,
-          });
-          if (!savedImgRes) {
-            throw new Error("Error saving the file");
-          }
-          // if (!response) {
-          //   throw new Error("Something went wrong");
-          // }
-          res.json({
-            result: savedImgRes,
-            success: true,
-            errorMessage: null,
-          });
-        } catch (err) {
-          throw new Error(
-            err.message || "Something wrong while saving the image"
-          );
-        }
+      const resp = await ImageService.uploadImage({
+        file: req.file,
+        imageType: EnumImageType.RESTAURANT_IMAGE,
+        ownerId: req.userId,
+        parentId: null,
+        targetPath,
+      });
+      console.log(resp);
+
+      return res.json({
+        data: "Image saved",
+        success: true,
+        errorMessage: null,
       });
     } catch (err) {
       return res.json({
@@ -114,12 +91,11 @@ export class RestaurantController {
 
   static getRestaurantImages = async (req, res) => {
     try {
-      const restaurantImagesRepo = myDataSource.getRepository(
-        RestaurantImagesEntity
-      );
-      const images = await restaurantImagesRepo.find({
+      const allImagesRepo = myDataSource.getRepository(AllImagesEntity);
+      const images = await allImagesRepo.find({
         where: {
           ownerId: req.userId,
+          imageType: EnumImageType.RESTAURANT_IMAGE,
         },
       });
 
@@ -139,10 +115,8 @@ export class RestaurantController {
 
   static deleteImage = async (req, res) => {
     try {
-      const restaurantImagesRepo = myDataSource.getRepository(
-        RestaurantImagesEntity
-      );
-      await restaurantImagesRepo.delete({
+      const allImagesRepo = myDataSource.getRepository(AllImagesEntity);
+      await allImagesRepo.delete({
         id: req.body.id,
       });
       const filePath =
@@ -184,6 +158,52 @@ export class RestaurantController {
       }
       return res.json({
         result: RestaurantLocation,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "Something went wrong",
+      });
+    }
+  };
+
+  static saveOrEditFoodItem = async (req, res) => {
+    try {
+      const validatedFoodItemData = foodItemSchema.safeParse(req.body);
+
+      if (!validatedFoodItemData.success) {
+        throw new Error("Invalid data");
+      }
+      await RestaurantService.saveOrEditFoodItem(validatedFoodItemData.data);
+      return res.json({
+        result: null,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err: any) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "Something went wrong",
+      });
+    }
+  };
+
+  static getAllFoodItems = async (req, res) => {
+    try {
+      const { restaurantId } = req.body;
+      if (!restaurantId) {
+        throw new Error("Please provide restaurantId");
+      }
+      const foodItems = await RestaurantService.getAllFoodItemsByRestaurantId(
+        restaurantId
+      );
+
+      return res.json({
+        result: foodItems,
         success: true,
         errorMessage: null,
       });
