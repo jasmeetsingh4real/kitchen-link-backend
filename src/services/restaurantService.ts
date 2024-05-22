@@ -5,6 +5,7 @@ import { AllImagesEntity } from "../entity/allImages.entity";
 import { StatesEntity } from "../entity/states.entity";
 import { TFoodItem } from "../schemas/RestaurantSchemas";
 import { FoodItemsEntity } from "../entity/foodItems.entity";
+import { CustomCategoriesEntity } from "../entity/customCategories.entity";
 const fs = require("fs");
 export class RestaurantService {
   static uploadRestaurantImage = async (imageDetails: {
@@ -77,5 +78,11 @@ export class RestaurantService {
         restaurantId,
       },
     });
+  };
+  static getCustomCategories = async () => {
+    const customCategoriesRepo = myDataSource.getRepository(
+      CustomCategoriesEntity
+    );
+    return await customCategoriesRepo.find();
   };
 }

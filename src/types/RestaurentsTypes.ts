@@ -46,8 +46,8 @@ export interface TCity {
   latitude: string;
   longitude: string;
 }
-
-export enum EnumFoodItemsType {
+//if you want to change these values, consider changing them at the frontend too
+export enum EnumFoodItemCategory {
   APPETIZER = "Appetizer",
   MAIN_COURSE = "Main Course",
   SIDE_DISH = "Side Dish",

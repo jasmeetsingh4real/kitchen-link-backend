@@ -215,4 +215,21 @@ export class RestaurantController {
       });
     }
   };
+  static getCustomCategories = async (req, res) => {
+    try {
+      const customCategories = await RestaurantService.getCustomCategories();
+
+      return res.json({
+        result: customCategories,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "Something went wrong",
+      });
+    }
+  };
 }

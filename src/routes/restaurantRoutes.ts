@@ -41,3 +41,8 @@ restaurantRouter.post(
 );
 
 restaurantRouter.get("/getAllFoodItems", RestaurantController.getAllFoodItems);
+
+restaurantRouter.get(
+  "/getCustomCategories",
+  RestaurantController.getCustomCategories
+);
