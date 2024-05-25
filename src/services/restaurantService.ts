@@ -6,6 +6,10 @@ import { StatesEntity } from "../entity/states.entity";
 import { TFoodItem } from "../schemas/RestaurantSchemas";
 import { FoodItemsEntity } from "../entity/foodItems.entity";
 import { CustomCategoriesEntity } from "../entity/customCategories.entity";
+import { EntityManager } from "typeorm";
+import { ImageService } from "./imageService";
+import { EnumImageType } from "../types/RestaurentsTypes";
+import { RestaurantEntity } from "../entity/restaurant.entity";
 const fs = require("fs");
 export class RestaurantService {
   static uploadRestaurantImage = async (imageDetails: {
@@ -58,24 +62,28 @@ export class RestaurantService {
     return `${restaurantCity.name}, ${restaurantState.name}, ${restaurantCountry.name}`;
   };
 
-  static saveOrEditFoodItem = async (foodItemData: TFoodItem) => {
-    const foodItemsRepo = myDataSource.getRepository(FoodItemsEntity);
-    if (!foodItemData.id) {
-      await foodItemsRepo.save(foodItemData);
-    } else {
-      await foodItemsRepo.update(
-        {
-          id: foodItemData.id,
-        },
-        foodItemData
-      );
-    }
+  static saveOrEditFoodItem = async (
+    foodItemData: TFoodItem,
+    txn: EntityManager
+  ) => {
+    const foodItemsRepo = txn.getRepository(FoodItemsEntity);
+    return await foodItemsRepo.save(foodItemData);
   };
-  static getAllFoodItemsByRestaurantId = async (restaurantId: number) => {
+
+  static getAllFoodItemsByRestaurantId = async (userId: string) => {
+    const restaurantRepo = myDataSource.getRepository(RestaurantEntity);
+    const restaurantDetails = await restaurantRepo.findOne({
+      where: {
+        ownerId: userId,
+      },
+    });
     const foodItemsRepo = myDataSource.getRepository(FoodItemsEntity);
     return await foodItemsRepo.find({
       where: {
-        restaurantId,
+        restaurantId: restaurantDetails.id,
+      },
+      relations: {
+        images: true,
       },
     });
   };
@@ -84,5 +92,45 @@ export class RestaurantService {
       CustomCategoriesEntity
     );
     return await customCategoriesRepo.find();
+  };
+  static saveFoodItemImage = async (
+    file,
+    ownerId,
+    foodItemId,
+    txn: EntityManager
+  ) => {
+    const targetPath = process.env.DEV_FOOD_ITEM_IMAGES_TARGET_PATH;
+    await ImageService.uploadImage({
+      file,
+      imageType: EnumImageType.FOOD_ITEM_IMAGE,
+      ownerId,
+      parentId: foodItemId,
+      targetPath,
+      txn,
+    });
+  };
+
+  static deleteFoodItemById = async (id: number) => {
+    await myDataSource.transaction(async (txn: EntityManager) => {
+      const imagesRepo = txn.getRepository(AllImagesEntity);
+      const imageDetails = await imagesRepo.findOne({
+        where: {
+          parentId: id,
+        },
+      });
+      if (imageDetails) {
+        const filePath =
+          process.env.DEV_FOOD_ITEM_IMAGES_TARGET_PATH + imageDetails.fileName;
+        ImageService.deleteImage({
+          filePath,
+          id: imageDetails.id,
+        }),
+          txn;
+      }
+      const foodItemsRepo = txn.getRepository(FoodItemsEntity);
+      await foodItemsRepo.delete({
+        id,
+      });
+    });
   };
 }

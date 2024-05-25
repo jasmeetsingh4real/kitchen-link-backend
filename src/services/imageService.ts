@@ -1,3 +1,4 @@
+import { EntityManager } from "typeorm";
 import { myDataSource } from "../db/datasource/app-data-source";
 import { AllImagesEntity } from "../entity/allImages.entity";
 import { EnumImageType } from "../types/RestaurentsTypes";
@@ -10,8 +11,11 @@ export class ImageService {
     ownerId: string;
     parentId: number | null;
     imageType: EnumImageType;
+    txn?: EntityManager | null;
   }) => {
-    const allImagesRepo = myDataSource.getRepository(AllImagesEntity);
+    const allImagesRepo = imageDetails.txn
+      ? imageDetails.txn.getRepository(AllImagesEntity)
+      : myDataSource.getRepository(AllImagesEntity);
     const tempPath = imageDetails.file.path;
     const timeString = new Date().getTime().toString();
     const fileName = timeString + imageDetails.file.filename;
@@ -24,7 +28,25 @@ export class ImageService {
       parentId: imageDetails.parentId,
     });
     if (!savedImgRes) {
-      throw new Error("Error saving the file 2");
+      throw new Error("Error saving the file");
     }
+  };
+
+  static deleteImage = async (
+    imgDetails: { id: number; filePath: string },
+    txn?: EntityManager
+  ) => {
+    const allImagesRepo = txn
+      ? txn.getRepository(AllImagesEntity)
+      : myDataSource.getRepository(AllImagesEntity);
+    await allImagesRepo.delete({
+      id: imgDetails.id,
+    });
+    fs.unlink(imgDetails.filePath, (err) => {
+      if (err) {
+        throw new Error("Something went wrong while deleting the image");
+      }
+      console.log("File deleted successfully");
+    });
   };
 }

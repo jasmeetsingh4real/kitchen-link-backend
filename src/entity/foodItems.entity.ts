@@ -2,10 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { EnumDietryInfo } from "../types/RestaurentsTypes";
+import { AllImagesEntity } from "./allImages.entity";
 
 @Entity({ name: "food_items" })
 export class FoodItemsEntity {
@@ -40,6 +43,11 @@ export class FoodItemsEntity {
     default: null,
   })
   foodItemSlugId: number;
+
+  @OneToMany(() => AllImagesEntity, (image) => image.foodItem, {
+    cascade: true,
+  })
+  images: AllImagesEntity[];
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;

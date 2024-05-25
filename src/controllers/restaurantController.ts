@@ -1,4 +1,4 @@
-import { ZodError } from "zod";
+import { ZodError, date } from "zod";
 import { myDataSource } from "../db/datasource/app-data-source";
 import { RestaurantEntity } from "../entity/restaurant.entity";
 import { foodItemSchema, restaurantSchema } from "../schemas/RestaurantSchemas";
@@ -7,6 +7,7 @@ import { AllImagesEntity } from "../entity/allImages.entity";
 import { RestaurantService } from "../services/restaurantService";
 import { EnumImageType } from "../types/RestaurentsTypes";
 import { ImageService } from "../services/imageService";
+import { EntityManager } from "typeorm";
 const fs = require("fs");
 const path = require("path");
 export class RestaurantController {
@@ -113,20 +114,16 @@ export class RestaurantController {
     }
   };
 
-  static deleteImage = async (req, res) => {
+  static deleteRestaurantImage = async (req, res) => {
     try {
-      const allImagesRepo = myDataSource.getRepository(AllImagesEntity);
-      await allImagesRepo.delete({
-        id: req.body.id,
-      });
+      if (!req.body.imageName || !req.body.id) {
+        ("invalid details");
+      }
       const filePath =
         process.env.DEV_RESTAURANT_IMAGES_TARGET_PATH + req.body.imageName;
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error("Error deleting file:", err);
-          return;
-        }
-        console.log("File deleted successfully");
+      await ImageService.deleteImage({
+        id: req.body.id,
+        filePath,
       });
       return res.json({
         result: "image deleted",
@@ -172,12 +169,40 @@ export class RestaurantController {
 
   static saveOrEditFoodItem = async (req, res) => {
     try {
-      const validatedFoodItemData = foodItemSchema.safeParse(req.body);
-
-      if (!validatedFoodItemData.success) {
-        throw new Error("Invalid data");
+      const foodItemDetails = JSON.parse(req.body.foodItemDetails);
+      if (!req.file && !foodItemDetails.id) {
+        throw new Error("No files were uploaded.");
       }
-      await RestaurantService.saveOrEditFoodItem(validatedFoodItemData.data);
+      await myDataSource.transaction(async (txn: EntityManager) => {
+        const restaurantRepo = txn.getRepository(RestaurantEntity);
+
+        const restaurantDetails = await restaurantRepo.findOne({
+          where: {
+            ownerId: req.userId,
+          },
+        });
+        if (!restaurantDetails) {
+          throw new Error("Restaurnt details not found!");
+        }
+        foodItemDetails["restaurantId"] = restaurantDetails.id;
+        const validatedFoodItemData = foodItemSchema.safeParse(foodItemDetails);
+
+        if (!validatedFoodItemData.success) {
+          throw new Error("Invalid data");
+        }
+        const saveResponse = await RestaurantService.saveOrEditFoodItem(
+          { ...validatedFoodItemData.data, id: foodItemDetails.id },
+          txn
+        );
+        if (!foodItemDetails.id) {
+          await RestaurantService.saveFoodItemImage(
+            req.file,
+            req.userId,
+            saveResponse.id,
+            txn
+          );
+        }
+      });
       return res.json({
         result: null,
         success: true,
@@ -194,12 +219,8 @@ export class RestaurantController {
 
   static getAllFoodItems = async (req, res) => {
     try {
-      const { restaurantId } = req.body;
-      if (!restaurantId) {
-        throw new Error("Please provide restaurantId");
-      }
       const foodItems = await RestaurantService.getAllFoodItemsByRestaurantId(
-        restaurantId
+        req.userId
       );
 
       return res.json({
@@ -221,6 +242,51 @@ export class RestaurantController {
 
       return res.json({
         result: customCategories,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "Something went wrong",
+      });
+    }
+  };
+  static deleteFoodItemImage = async (req, res) => {
+    try {
+      if (!req.body.imageName || !req.body.id) {
+        ("invalid details");
+      }
+      const filePath =
+        process.env.DEV_FOOD_ITEM_IMAGES_TARGET_PATH + req.body.imageName;
+      await ImageService.deleteImage({
+        id: req.body.id,
+        filePath,
+      });
+
+      return res.json({
+        result: "",
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "Something went wrong",
+      });
+    }
+  };
+  static deleteFoodItem = async (req, res) => {
+    try {
+      if (!req.body.id) {
+        throw new Error("Invalid request");
+      }
+      await RestaurantService.deleteFoodItemById(req.body.id);
+
+      return res.json({
+        result: "",
         success: true,
         errorMessage: null,
       });

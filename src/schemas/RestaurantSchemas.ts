@@ -22,7 +22,6 @@ export const restaurantSchema = z.object({
 export type TRestaurant = z.infer<typeof restaurantSchema>;
 
 export const foodItemSchema = z.object({
-  id: z.number().optional(),
   name: z.string().min(1),
   description: z.string().min(1),
   category: z.string().min(1),
@@ -32,4 +31,8 @@ export const foodItemSchema = z.object({
   foodItemSlugId: z.number().optional(),
   restaurantId: z.number(),
 });
-export type TFoodItem = z.infer<typeof foodItemSchema>;
+type TZodFoodItem = z.infer<typeof foodItemSchema>;
+
+export type TFoodItem = TZodFoodItem & {
+  id?: number;
+};

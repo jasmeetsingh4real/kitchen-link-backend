@@ -1,5 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { EnumImageType } from "../types/RestaurentsTypes";
+import { FoodItemsEntity } from "./foodItems.entity";
 
 @Entity({ name: "all_images" })
 export class AllImagesEntity {
@@ -19,6 +26,10 @@ export class AllImagesEntity {
     default: null,
   })
   parentId: number;
+
+  @ManyToOne(() => FoodItemsEntity, (foodItem) => foodItem.images)
+  @JoinColumn({ name: "parentId" })
+  foodItem: FoodItemsEntity;
 
   @Column({
     type: "enum",

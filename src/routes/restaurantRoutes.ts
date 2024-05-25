@@ -1,4 +1,5 @@
 import { RestaurantController } from "../controllers/restaurantController";
+import { upload } from "../helpers/multerHelper";
 const multer = require("multer");
 
 const express = require("express");
@@ -8,17 +9,6 @@ restaurantRouter.post(
   "/createRestaurant",
   RestaurantController.createRestaurant
 );
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-
-const upload = multer({ storage: storage });
 
 restaurantRouter.post(
   "/uploadResImage",
@@ -33,11 +23,9 @@ restaurantRouter.post(
   "/getRestaurantLocation",
   RestaurantController.getRestaurantLocation
 );
-restaurantRouter.post("/deleteImage", RestaurantController.deleteImage);
-
 restaurantRouter.post(
-  "/saveOrEditFoodItem",
-  RestaurantController.saveOrEditFoodItem
+  "/deleteRestaurantImage",
+  RestaurantController.deleteRestaurantImage
 );
 
 restaurantRouter.get("/getAllFoodItems", RestaurantController.getAllFoodItems);
@@ -46,3 +34,15 @@ restaurantRouter.get(
   "/getCustomCategories",
   RestaurantController.getCustomCategories
 );
+
+restaurantRouter.post(
+  "/saveOrEditFoodItem",
+  upload.single("image"),
+  RestaurantController.saveOrEditFoodItem
+);
+
+restaurantRouter.post(
+  "/deleteFoodItemImage",
+  RestaurantController.deleteFoodItemImage
+);
+restaurantRouter.post("/deleteFoodItem", RestaurantController.deleteFoodItem);
