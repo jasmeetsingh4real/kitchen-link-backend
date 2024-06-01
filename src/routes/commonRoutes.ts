@@ -13,3 +13,10 @@ commonRouter.post(
   CommonController.getCitiesByStateCode
 );
 commonRouter.post("/getCountryById", CommonController.getCountryById);
+
+commonRouter.post("/searchRestaurants", CommonController.searchRestaurants);
+
+commonRouter.post(
+  "/getRestaurantsByStateId",
+  CommonController.getRestaurantsByStateId
+);

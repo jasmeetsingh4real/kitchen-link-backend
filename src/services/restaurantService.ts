@@ -6,7 +6,7 @@ import { StatesEntity } from "../entity/states.entity";
 import { TFoodItem } from "../schemas/RestaurantSchemas";
 import { FoodItemsEntity } from "../entity/foodItems.entity";
 import { CustomCategoriesEntity } from "../entity/customCategories.entity";
-import { EntityManager } from "typeorm";
+import { EntityManager, Like } from "typeorm";
 import { ImageService } from "./imageService";
 import { EnumImageType } from "../types/RestaurentsTypes";
 import { RestaurantEntity } from "../entity/restaurant.entity";
@@ -66,6 +66,9 @@ export class RestaurantService {
     foodItemData: TFoodItem,
     txn: EntityManager
   ) => {
+    if (!foodItemData.id) {
+      foodItemData.id = undefined;
+    }
     const foodItemsRepo = txn.getRepository(FoodItemsEntity);
     return await foodItemsRepo.save(foodItemData);
   };
@@ -110,7 +113,7 @@ export class RestaurantService {
     });
   };
 
-  static deleteFoodItemById = async (id: number) => {
+  static deleteFoodItemById = async (id: string) => {
     await myDataSource.transaction(async (txn: EntityManager) => {
       const imagesRepo = txn.getRepository(AllImagesEntity);
       const imageDetails = await imagesRepo.findOne({
@@ -131,6 +134,28 @@ export class RestaurantService {
       await foodItemsRepo.delete({
         id,
       });
+    });
+  };
+  static searchRestaurants = async (props: {
+    stateId: number;
+    keyword: string;
+  }) => {
+    const restaurantRepo = myDataSource.getRepository(RestaurantEntity);
+    const query = {};
+    if (props.keyword) {
+      query["restaurantName"] = Like(`%${props.keyword}%`);
+    }
+    if (props.stateId) {
+      query["stateId"] = Like(`%${props.stateId}%`);
+    }
+
+    return restaurantRepo.find({
+      where: query,
+      relations: {
+        foodItems: true,
+        images: true,
+      },
+      take: 10,
     });
   };
 }

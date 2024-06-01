@@ -1,10 +1,20 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { EnumRestaurantStatus } from "../types/RestaurentsTypes";
+import { FoodItemsEntity } from "./foodItems.entity";
+import { AllImagesEntity } from "./allImages.entity";
 
 @Entity({ name: "restaurants" })
 export class RestaurantEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid", {
+    name: "id",
+  })
+  id: string;
 
   @Column()
   restaurantName: string;
@@ -39,6 +49,16 @@ export class RestaurantEntity {
 
   @Column()
   streetAddress: string;
+
+  @OneToMany(() => FoodItemsEntity, (foodItem) => foodItem.restaurant, {
+    cascade: true,
+  })
+  foodItems: FoodItemsEntity[];
+
+  @OneToMany(() => AllImagesEntity, (image) => image.restaurant, {
+    cascade: true,
+  })
+  images: AllImagesEntity[];
 
   @Column({
     type: "enum",

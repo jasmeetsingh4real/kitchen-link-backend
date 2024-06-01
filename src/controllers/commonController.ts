@@ -3,6 +3,7 @@ import { CitiesEntity } from "../entity/cities.entity";
 import { CountriesEntity } from "../entity/countries.entity";
 import { StatesEntity } from "../entity/states.entity";
 import { CountriesService } from "../services/countriesService";
+import { RestaurantService } from "../services/restaurantService";
 import { TState } from "../types/RestaurentsTypes";
 
 export class CommonController {
@@ -166,6 +167,55 @@ export class CommonController {
           label: country.name,
           value: { id: country.id, code: country.iso2 },
         },
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
+
+  static searchRestaurants = async (req, res) => {
+    try {
+      const stateId = req.body.id;
+      const keyword = req.body.keyword;
+      let restaurants = [];
+      if (keyword) {
+        restaurants = await RestaurantService.searchRestaurants({
+          stateId,
+          keyword,
+        });
+      }
+      return res.json({
+        result: restaurants,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
+
+  static getRestaurantsByStateId = async (req, res) => {
+    const { stateId } = req.body;
+    if (!stateId) {
+      throw new Error("Invalid request");
+    }
+    const restaurants = await RestaurantService.searchRestaurants({
+      keyword: "",
+      stateId,
+    });
+    try {
+      return res.json({
+        result: restaurants,
         success: true,
         errorMessage: null,
       });

@@ -27,7 +27,12 @@ app.use(
 
 app.use(express.json());
 
+//routes without middlewares
 app.use("/common", commonRouter);
+
+//routes for login signup
 app.use("/auth", authRouter);
+
+//routes for admin
 app.use("/master", verifySellerToken, restaurantRouter);
 export default app;

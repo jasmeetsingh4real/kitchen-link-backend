@@ -8,16 +8,23 @@ import { RestaurantService } from "../services/restaurantService";
 import { EnumImageType } from "../types/RestaurentsTypes";
 import { ImageService } from "../services/imageService";
 import { EntityManager } from "typeorm";
+import moment = require("moment");
 const fs = require("fs");
 const path = require("path");
 export class RestaurantController {
   static createRestaurant = async (req, res) => {
     try {
       const restaurantRepo = myDataSource.getRepository(RestaurantEntity);
-      const verifiedResData = restaurantSchema.parse({
+      let verifiedResData = restaurantSchema.parse({
         ...req.body,
         ownerId: req.userId,
       });
+      verifiedResData.openingTime = moment(verifiedResData.openingTime)
+        .year(2024)
+        .format("YYYY-MM-DD HH:mm:ss");
+      verifiedResData.closingTime = moment(verifiedResData.closingTime)
+        .year(2024)
+        .format("YYYY-MM-DD HH:mm:ss");
 
       await CountriesService.verifyRestaurantLoc(
         verifiedResData.countryId,
@@ -25,7 +32,12 @@ export class RestaurantController {
         verifiedResData.cityId
       );
       if (req.body.id) {
-        await restaurantRepo.update({ id: req.body.id }, verifiedResData);
+        await restaurantRepo.update(
+          { id: req.body.id },
+          {
+            ...verifiedResData,
+          }
+        );
         const updateResponse = await restaurantRepo.findOne({
           where: { id: req.body.id },
         });
@@ -64,14 +76,22 @@ export class RestaurantController {
       if (!req.file) {
         return res.status(400).send("No files were uploaded.");
       }
-
+      const restaurantRepo = myDataSource.getRepository(RestaurantEntity);
       const targetPath = process.env.DEV_RESTAURANT_IMAGES_TARGET_PATH;
 
+      const restaurantDetails = await restaurantRepo.findOne({
+        where: {
+          ownerId: req.userId,
+        },
+      });
+      if (!restaurantDetails) {
+        throw new Error("Restaurant not found");
+      }
       const resp = await ImageService.uploadImage({
         file: req.file,
         imageType: EnumImageType.RESTAURANT_IMAGE,
         ownerId: req.userId,
-        parentId: null,
+        parentId: restaurantDetails.id,
         targetPath,
       });
       console.log(resp);
@@ -170,6 +190,7 @@ export class RestaurantController {
   static saveOrEditFoodItem = async (req, res) => {
     try {
       const foodItemDetails = JSON.parse(req.body.foodItemDetails);
+
       if (!req.file && !foodItemDetails.id) {
         throw new Error("No files were uploaded.");
       }
@@ -190,8 +211,13 @@ export class RestaurantController {
         if (!validatedFoodItemData.success) {
           throw new Error("Invalid data");
         }
+        if (foodItemDetails) {
+          validatedFoodItemData.data["id"] = foodItemDetails.id;
+        } else {
+          validatedFoodItemData.data["id"] = undefined;
+        }
         const saveResponse = await RestaurantService.saveOrEditFoodItem(
-          { ...validatedFoodItemData.data, id: foodItemDetails.id },
+          validatedFoodItemData.data,
           txn
         );
         if (!foodItemDetails.id) {

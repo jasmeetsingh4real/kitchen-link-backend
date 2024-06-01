@@ -9,7 +9,7 @@ export class ImageService {
     file: any;
     targetPath: string;
     ownerId: string;
-    parentId: number | null;
+    parentId: string | null;
     imageType: EnumImageType;
     txn?: EntityManager | null;
   }) => {

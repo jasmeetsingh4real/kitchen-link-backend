@@ -5,7 +5,7 @@ import {
 } from "../types/RestaurentsTypes";
 
 export const restaurantSchema = z.object({
-  id: z.number().optional(),
+  id: z.string().optional(),
   ownerId: z.string().min(1),
   restaurantName: z.string().min(1),
   openingTime: z.string().min(1),
@@ -29,10 +29,10 @@ export const foodItemSchema = z.object({
   ingredients: z.string().optional(),
   dietryInfo: z.nativeEnum(EnumDietryInfo),
   foodItemSlugId: z.number().optional(),
-  restaurantId: z.number(),
+  restaurantId: z.string(),
 });
 type TZodFoodItem = z.infer<typeof foodItemSchema>;
 
 export type TFoodItem = TZodFoodItem & {
-  id?: number;
+  id?: string;
 };
