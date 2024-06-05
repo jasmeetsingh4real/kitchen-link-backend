@@ -46,3 +46,20 @@ restaurantRouter.post(
   RestaurantController.deleteFoodItemImage
 );
 restaurantRouter.post("/deleteFoodItem", RestaurantController.deleteFoodItem);
+
+restaurantRouter.post(
+  "/addFoodItemOption",
+  RestaurantController.addFoodItemOption
+);
+restaurantRouter.post(
+  "/editFoodItemOption",
+  RestaurantController.editFoodItemOption
+);
+restaurantRouter.post(
+  "/deleteFoodOption",
+  RestaurantController.deleteFoodOption
+);
+restaurantRouter.post(
+  "/getFoodOptionsByFoodItemId",
+  RestaurantController.getFoodOptionsByFoodItemId
+);

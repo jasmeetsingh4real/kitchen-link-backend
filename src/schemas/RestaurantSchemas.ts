@@ -36,3 +36,12 @@ type TZodFoodItem = z.infer<typeof foodItemSchema>;
 export type TFoodItem = TZodFoodItem & {
   id?: string;
 };
+
+export const foodItemOptionSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1),
+  price: z.number(),
+  foodItemId: z.string().min(1),
+});
+
+export type TFoodItemOption = z.infer<typeof foodItemOptionSchema>;

@@ -3,13 +3,14 @@ import { CitiesEntity } from "../entity/cities.entity";
 import { CountriesEntity } from "../entity/countries.entity";
 import { AllImagesEntity } from "../entity/allImages.entity";
 import { StatesEntity } from "../entity/states.entity";
-import { TFoodItem } from "../schemas/RestaurantSchemas";
+import { TFoodItem, TFoodItemOption } from "../schemas/RestaurantSchemas";
 import { FoodItemsEntity } from "../entity/foodItems.entity";
 import { CustomCategoriesEntity } from "../entity/customCategories.entity";
 import { EntityManager, Like } from "typeorm";
 import { ImageService } from "./imageService";
 import { EnumImageType } from "../types/RestaurentsTypes";
 import { RestaurantEntity } from "../entity/restaurant.entity";
+import { FoodItemOptionsEntity } from "../entity/foodItemOptions.entity";
 const fs = require("fs");
 export class RestaurantService {
   static uploadRestaurantImage = async (imageDetails: {
@@ -73,7 +74,7 @@ export class RestaurantService {
     return await foodItemsRepo.save(foodItemData);
   };
 
-  static getAllFoodItemsByRestaurantId = async (userId: string) => {
+  static getAllFoodItemsByOwnerId = async (userId: string) => {
     const restaurantRepo = myDataSource.getRepository(RestaurantEntity);
     const restaurantDetails = await restaurantRepo.findOne({
       where: {
@@ -156,6 +157,82 @@ export class RestaurantService {
         images: true,
       },
       take: 10,
+    });
+  };
+  static getRestaurantDetailsById = async (id: string) => {
+    const restaurantsRepo = myDataSource.getRepository(RestaurantEntity);
+    return restaurantsRepo.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        images: true,
+      },
+    });
+  };
+  static getRestaurantFoodItems = async (restaurantId) => {
+    const foodItemsRepo = myDataSource.getRepository(FoodItemsEntity);
+    return foodItemsRepo.find({
+      where: {
+        restaurantId,
+      },
+      relations: {
+        images: true,
+      },
+    });
+  };
+  static getRestaurantsByStateName = async (stateName: string) => {
+    const StatesRepo = myDataSource.getRepository(StatesEntity);
+
+    const stateDetails = await StatesRepo.findOne({
+      where: {
+        name: stateName,
+      },
+    });
+    if (!stateDetails) {
+      throw new Error("Location data not found");
+    }
+    return this.searchRestaurants({ keyword: "", stateId: stateDetails.id });
+  };
+
+  static addFoodItemOption = async (
+    foodItemOptionData: TFoodItemOption,
+    userId: string
+  ) => {
+    if (!userId) {
+      throw new Error("Please provide userId");
+    }
+    const foodItemOptionRepo = myDataSource.getRepository(
+      FoodItemOptionsEntity
+    );
+
+    const foodItemsRepo = myDataSource.getRepository(FoodItemsEntity);
+
+    const foodItemDetails = await foodItemsRepo.findOne({
+      where: {
+        id: foodItemOptionData.foodItemId,
+      },
+      relations: {
+        restaurant: true,
+      },
+    });
+    if (!foodItemDetails || foodItemDetails.restaurant.ownerId !== userId) {
+      throw new Error("Invalid foodItem id");
+    }
+
+    await foodItemOptionRepo.save(foodItemOptionData);
+  };
+
+  static deleteFoodOption = async (id: string) => {
+    const foodOptionRepo = myDataSource.getRepository(FoodItemOptionsEntity);
+    await foodOptionRepo.delete({ id });
+  };
+  static getFoodOptionsByFoodItemId = async (id) => {
+    const foodOptionRepo = myDataSource.getRepository(FoodItemOptionsEntity);
+    return foodOptionRepo.find({
+      where: {
+        foodItemId: id,
+      },
     });
   };
 }

@@ -11,6 +11,7 @@ import {
 import { EnumDietryInfo } from "../types/RestaurentsTypes";
 import { AllImagesEntity } from "./allImages.entity";
 import { RestaurantEntity } from "./restaurant.entity";
+import { FoodItemOptionsEntity } from "./foodItemOptions.entity";
 
 @Entity({ name: "food_items" })
 export class FoodItemsEntity {
@@ -56,6 +57,13 @@ export class FoodItemsEntity {
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.foodItems)
   @JoinColumn({ name: "restaurantId" })
   restaurant: RestaurantEntity;
+
+  @OneToMany(
+    () => FoodItemOptionsEntity,
+    (foodItemOption) => foodItemOption.foodItem,
+    { cascade: true }
+  )
+  foodItemOptions: FoodItemOptionsEntity[];
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;

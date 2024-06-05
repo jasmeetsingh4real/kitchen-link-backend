@@ -1,7 +1,11 @@
 import { ZodError, date } from "zod";
 import { myDataSource } from "../db/datasource/app-data-source";
 import { RestaurantEntity } from "../entity/restaurant.entity";
-import { foodItemSchema, restaurantSchema } from "../schemas/RestaurantSchemas";
+import {
+  foodItemOptionSchema,
+  foodItemSchema,
+  restaurantSchema,
+} from "../schemas/RestaurantSchemas";
 import { CountriesService } from "../services/countriesService";
 import { AllImagesEntity } from "../entity/allImages.entity";
 import { RestaurantService } from "../services/restaurantService";
@@ -245,7 +249,7 @@ export class RestaurantController {
 
   static getAllFoodItems = async (req, res) => {
     try {
-      const foodItems = await RestaurantService.getAllFoodItemsByRestaurantId(
+      const foodItems = await RestaurantService.getAllFoodItemsByOwnerId(
         req.userId
       );
 
@@ -321,6 +325,138 @@ export class RestaurantController {
         result: null,
         success: false,
         errorMessage: err.message || "Something went wrong",
+      });
+    }
+  };
+  static getRestaurantDetailsById = async (req, res) => {
+    try {
+      if (!req.body.id) {
+        throw new Error("Invalid request");
+      }
+      const restaurantDetails =
+        await RestaurantService.getRestaurantDetailsById(req.body.id);
+      if (!restaurantDetails) {
+        throw new Error("Restaurant details not found");
+      }
+      return res.json({
+        result: restaurantDetails,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
+
+  static getRestaurantFoodItems = async (req, res) => {
+    try {
+      if (!req.body.restaurantId) {
+        throw new Error("Something went wrong");
+      }
+
+      const foodItems = await RestaurantService.getRestaurantFoodItems(
+        req.body.restaurantId
+      );
+
+      return res.json({
+        result: foodItems,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
+  static addFoodItemOption = async (req, res) => {
+    try {
+      const validatedData = foodItemOptionSchema.safeParse(req.body);
+      if (!validatedData.success) {
+        throw new Error("Invalid data");
+      }
+      await RestaurantService.addFoodItemOption(validatedData.data, req.userId);
+
+      return res.json({
+        result: "Food Option Added",
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
+
+  static editFoodItemOption = async (req, res) => {
+    try {
+      if (!req.body.id) {
+        throw new Error("Food Option id not found");
+      }
+      const validatedData = foodItemOptionSchema.safeParse(req.body);
+      if (!validatedData.success) {
+        throw new Error("Invalid data");
+      }
+      await RestaurantService.addFoodItemOption(validatedData.data, req.userId);
+      return res.json({
+        result: "Food Option Saved",
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
+  static deleteFoodOption = async (req, res) => {
+    try {
+      if (!req.body.id) {
+        throw new Error("FoodOption id not found");
+      }
+      await RestaurantService.deleteFoodOption(req.body.id);
+      return res.json({
+        result: "Food Option Saved",
+        success: true,
+        errorMessage: null,
+      });
+    } catch (error) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: error.message || "something went wrong",
+      });
+    }
+  };
+  static getFoodOptionsByFoodItemId = async (req, res) => {
+    try {
+      if (!req.body.id) {
+        throw new Error("Please provide food option id");
+      }
+      const foodOptions = await RestaurantService.getFoodOptionsByFoodItemId(
+        req.body.id
+      );
+      return res.json({
+        result: foodOptions,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (error) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: error.message || "something went wrong",
       });
     }
   };

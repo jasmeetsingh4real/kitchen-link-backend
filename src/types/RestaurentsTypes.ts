@@ -70,3 +70,8 @@ export enum EnumImageType {
   FOOD_ITEM_IMAGE = "food_item_image",
   FOOD_ITEM_OPTION_IMAGE = "food_item_option_image",
 }
+
+export enum EnumOrderItemType {
+  FOOD_ITEM = "food_item",
+  FOOD_ITEM_OPTION = "food_item_option",
+}
