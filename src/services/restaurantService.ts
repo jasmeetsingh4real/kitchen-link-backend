@@ -178,6 +178,7 @@ export class RestaurantService {
       },
       relations: {
         images: true,
+        foodItemOptions: true,
       },
     });
   };
