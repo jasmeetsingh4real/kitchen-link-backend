@@ -9,6 +9,7 @@ import { FoodItemsEntity } from "../entity/foodItems.entity";
 import { FoodItemOptionsEntity } from "../entity/foodItemOptions.entity";
 import { OrdersItemsEntity } from "../entity/ordersItems.entity";
 import { RestaurantEntity } from "../entity/restaurant.entity";
+import { RestaurantService } from "./restaurantService";
 
 export class UserService {
   static saveUserDeliveryLocation = async (locatonData: TLocation) => {
@@ -22,8 +23,24 @@ export class UserService {
     if (!cityData) {
       throw new Error("Invalid city");
     }
+
     const locationRepo = myDataSource.getRepository(DeliveryLocationEntity);
-    await locationRepo.save(locatonData);
+
+    const existingLocation = await locationRepo.findOne({
+      where: {
+        userId: locatonData.userId,
+      },
+    });
+    if (existingLocation) {
+      await locationRepo.update(
+        {
+          userId: locatonData.userId,
+        },
+        locatonData
+      );
+    } else {
+      await locationRepo.save(locatonData);
+    }
   };
 
   static getSavedLocationDetailsByUserId = async (id: string) => {
@@ -85,32 +102,30 @@ export class UserService {
         );
         totalFoodItemsAmount += foodItemInDb.price * itemDetails.quantity;
       });
-      const foodOptions = orderItems.filter(
-        (item) => item.itemType === EnumOrderItemType.FOOD_ITEM_OPTION
-      );
-      if (foodOptions.length > 0) {
-        const foodOptionIds = foodOptions.map(
-          (foodOption) => foodOption.itemId
-        );
-        //TODO : ADD RESTAURANT_ID IN FOOD_OPTIONS TABLE
-        foodOptionsInDb = await foodOptionsRepo.find({
-          where: {
-            id: In(foodOptionIds),
-          },
-        });
+    }
+    const foodOptions = orderItems.filter(
+      (item) => item.itemType === EnumOrderItemType.FOOD_ITEM_OPTION
+    );
+    if (foodOptions.length > 0) {
+      const foodOptionIds = foodOptions.map((foodOption) => foodOption.itemId);
+      //TODO : ADD RESTAURANT_ID IN FOOD_OPTIONS TABLE
+      foodOptionsInDb = await foodOptionsRepo.find({
+        where: {
+          id: In(foodOptionIds),
+        },
+      });
 
-        if (foodOptionsInDb.length !== foodOptions.length) {
-          throw new Error("invalid order details");
-        }
-
-        foodOptionsInDb.forEach((foodOptionInDb) => {
-          const foodOptionsDetails = foodOptions.find(
-            (item) => item.itemId === foodOptionInDb.id
-          );
-          totalFoodOptionsAmount +=
-            foodOptionInDb.price * foodOptionsDetails.quantity;
-        });
+      if (foodOptionsInDb.length !== foodOptions.length) {
+        throw new Error("invalid order details");
       }
+
+      foodOptionsInDb.forEach((foodOptionInDb) => {
+        const foodOptionsDetails = foodOptions.find(
+          (item) => item.itemId === foodOptionInDb.id
+        );
+        totalFoodOptionsAmount +=
+          foodOptionInDb.price * foodOptionsDetails.quantity;
+      });
     }
     return totalFoodOptionsAmount + totalFoodItemsAmount;
   };
@@ -154,5 +169,49 @@ export class UserService {
 
       return savedOrder.id;
     });
+  };
+
+  static getOrderDetails = async (orderId: string) => {
+    const orderRepo = myDataSource.getRepository(OrdersEntity);
+    const orderItemsRepo = myDataSource.getRepository(OrdersItemsEntity);
+    const cityRepo = myDataSource.getRepository(CitiesEntity);
+    const orderDetails = await orderRepo.findOne({
+      where: {
+        id: orderId,
+      },
+    });
+
+    const address: TLocation = JSON.parse(orderDetails.address);
+
+    const cityDetails = await cityRepo.findOne({
+      where: {
+        id: address.cityId,
+      },
+    });
+
+    const addressString = await RestaurantService.getRestaurantLocation({
+      cityId: cityDetails.id,
+      countryId: cityDetails.countryId,
+      stateId: cityDetails.stateId,
+    });
+    orderDetails.address = "";
+    const OrderInfo = {
+      ...orderDetails,
+      addressInfo: {
+        ...address,
+        locationString: addressString,
+      },
+    };
+
+    if (!orderDetails) {
+      throw new Error("Order details not found");
+    }
+    const orderItems = await orderItemsRepo.find({
+      where: {
+        orderId,
+      },
+    });
+
+    return { OrderInfo, orderItems };
   };
 }

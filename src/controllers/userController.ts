@@ -58,7 +58,7 @@ export class UserController {
       return res.json({
         success: true,
         errorMessage: null,
-        result: location,
+        result: "location deleted",
       });
     } catch (err: any) {
       return res.json({
@@ -93,6 +93,30 @@ export class UserController {
         success: true,
         errorMessage: null,
         result: orderId,
+      });
+    } catch (err) {
+      return res.json({
+        success: false,
+        errorMessage: err.message || "Something went wrong",
+        result: null,
+      });
+    }
+  };
+
+  static getOrderDetails = async (req, res) => {
+    try {
+      if (!req?.body?.orderId) {
+        throw new Error("OrderId not found");
+      }
+
+      const orderDetails = await UserService.getOrderDetails(
+        req?.body?.orderId
+      );
+
+      return res.json({
+        result: orderDetails,
+        success: true,
+        errorMessage: null,
       });
     } catch (err) {
       return res.json({

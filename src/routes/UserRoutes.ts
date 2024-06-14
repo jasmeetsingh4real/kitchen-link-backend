@@ -16,3 +16,5 @@ userRouter.get(
 userRouter.get("/deleteUserLocation", UserController.deleteUserLocation);
 
 userRouter.post("/createOrder", UserController.createOrder);
+
+userRouter.post("/getOrderDetails", UserController.getOrderDetails);

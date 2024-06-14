@@ -15,6 +15,8 @@ export class DeliveryLocationEntity {
   @Column()
   houseNo: string;
   @Column()
+  userName: string;
+  @Column()
   streetNo: string;
   @Column()
   userId: string;
