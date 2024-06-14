@@ -15,11 +15,23 @@ export class OrdersEntity {
 
   @Column()
   isFulfilled: boolean;
+
   @Column()
   isPaid: boolean;
 
   @Column()
   totalAmount: number;
+
+  @Column()
+  tax: number;
+  @Column()
+  address: string;
+
+  @Column()
+  restaurantId: string;
+
+  @Column()
+  userId: string;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;

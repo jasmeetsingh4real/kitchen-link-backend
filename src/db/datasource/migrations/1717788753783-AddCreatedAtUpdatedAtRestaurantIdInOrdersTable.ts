@@ -17,7 +17,7 @@ export class AddCreatedAtUpdatedAtRestaurantIdInOrdersTable1717788753783
         onUpdate: "CURRENT_TIMESTAMP",
       }),
       new TableColumn({
-        name: "retaurantId",
+        name: "restaurantId",
         type: "varchar",
       }),
       new TableColumn({
@@ -35,7 +35,7 @@ export class AddCreatedAtUpdatedAtRestaurantIdInOrdersTable1717788753783
     await queryRunner.dropColumns("orders", [
       "createdAt",
       "updatedAt",
-      "retaurantId",
+      "restaurantId",
       "tax",
     ]);
   }

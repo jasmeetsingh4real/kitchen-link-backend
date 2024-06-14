@@ -20,7 +20,7 @@ export class CreateOrderItemsTable1717465564906 implements MigrationInterface {
             type: "varchar",
           },
           {
-            name: "quantitiy",
+            name: "quantity",
             type: "int",
           },
           {

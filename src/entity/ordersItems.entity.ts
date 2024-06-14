@@ -19,7 +19,13 @@ export class OrdersItemsEntity {
   itemId: string;
 
   @Column()
-  quantitiy: number;
+  quantity: number;
+
+  @Column()
+  orderId: string;
+
+  @Column()
+  name: string;
 
   @Column()
   totalAmount: number;

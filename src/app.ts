@@ -3,7 +3,8 @@ import { myDataSource } from "./db/datasource/app-data-source";
 import { authRouter } from "./routes/authRoutes";
 import { commonRouter } from "./routes/commonRoutes";
 import { restaurantRouter } from "./routes/restaurantRoutes";
-import { verifySellerToken } from "./middleware/authMiddleware";
+import { verifySellerToken, verifyToken } from "./middleware/authMiddleware";
+import { userRouter } from "./routes/UserRoutes";
 const cors = require("cors");
 
 const bodyParser = require("body-parser");
@@ -35,4 +36,7 @@ app.use("/auth", authRouter);
 
 //routes for admin
 app.use("/master", verifySellerToken, restaurantRouter);
+
+app.use("/user", verifyToken, userRouter);
+
 export default app;
