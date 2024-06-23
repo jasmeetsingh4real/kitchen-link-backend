@@ -74,22 +74,43 @@ export class RestaurantService {
     return await foodItemsRepo.save(foodItemData);
   };
 
-  static getAllFoodItemsByOwnerId = async (userId: string) => {
+  static getAllFoodItemsByOwnerId = async (
+    userId: string,
+
+    page: number
+  ) => {
     const restaurantRepo = myDataSource.getRepository(RestaurantEntity);
+
     const restaurantDetails = await restaurantRepo.findOne({
       where: {
         ownerId: userId,
       },
     });
+    const pagination = {
+      perPage: 5,
+      recordsToSkip: 0,
+      page: page,
+      totalRecords: 0,
+      totalPages: 1,
+    };
     const foodItemsRepo = myDataSource.getRepository(FoodItemsEntity);
-    return await foodItemsRepo.find({
+    const [foodItems, totalItems] = await foodItemsRepo.findAndCount({
       where: {
         restaurantId: restaurantDetails.id,
       },
       relations: {
         images: true,
       },
+      skip: (page - 1) * pagination.perPage,
+      take: pagination.perPage,
     });
+    pagination.recordsToSkip = pagination.perPage * (page - 1);
+    pagination.totalRecords = totalItems;
+    pagination.totalPages = Math.ceil(
+      pagination.totalRecords / pagination.perPage
+    );
+
+    return { pagination, foodItems };
   };
   static getCustomCategories = async () => {
     const customCategoriesRepo = myDataSource.getRepository(
@@ -140,6 +161,13 @@ export class RestaurantService {
   static searchRestaurants = async (props: {
     stateId: number;
     keyword: string;
+    pagination?: {
+      perPage: number;
+      recordsToSkip: number;
+      page: number;
+      totalRecords: number;
+      totalPages: number;
+    };
   }) => {
     const restaurantRepo = myDataSource.getRepository(RestaurantEntity);
     const query = {};
@@ -149,7 +177,17 @@ export class RestaurantService {
     if (props.stateId) {
       query["stateId"] = Like(`%${props.stateId}%`);
     }
-
+    if (props.pagination) {
+      return restaurantRepo.findAndCount({
+        where: query,
+        relations: {
+          foodItems: true,
+          images: true,
+        },
+        skip: (props.pagination.page - 1) * props.pagination.perPage,
+        take: props.pagination.perPage,
+      });
+    }
     return restaurantRepo.find({
       where: query,
       relations: {
@@ -182,9 +220,18 @@ export class RestaurantService {
       },
     });
   };
-  static getRestaurantsByStateName = async (stateName: string) => {
+  static getRestaurantsByStateName = async (
+    stateName: string,
+    page: number
+  ) => {
     const StatesRepo = myDataSource.getRepository(StatesEntity);
-
+    const pagination = {
+      perPage: 6,
+      recordsToSkip: 0,
+      page,
+      totalRecords: 0,
+      totalPages: 1,
+    };
     const stateDetails = await StatesRepo.findOne({
       where: {
         name: stateName,
@@ -193,7 +240,20 @@ export class RestaurantService {
     if (!stateDetails) {
       throw new Error("Location data not found");
     }
-    return this.searchRestaurants({ keyword: "", stateId: stateDetails.id });
+    const [restaurants, totalItems] = await this.searchRestaurants({
+      keyword: "",
+      stateId: stateDetails.id,
+      pagination,
+    });
+    if (typeof totalItems !== "number") {
+      throw new Error("");
+    }
+    pagination.recordsToSkip = pagination.perPage * (page - 1);
+    pagination.totalRecords = totalItems;
+    pagination.totalPages = Math.ceil(
+      pagination.totalRecords / pagination.perPage
+    );
+    return { restaurants, pagination };
   };
 
   static addFoodItemOption = async (

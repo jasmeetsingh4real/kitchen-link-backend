@@ -206,14 +206,14 @@ export class CommonController {
 
   static getRestaurantsByStateName = async (req, res) => {
     try {
-      const { stateName } = req.body;
-      if (!stateName) {
+      const { stateName, page } = req.body;
+      if (!stateName || !page) {
         throw new Error("Invalid request");
       }
-      const restaurants = await RestaurantService.getRestaurantsByStateName(
-        stateName
-      );
+      const { restaurants, pagination } =
+        await RestaurantService.getRestaurantsByStateName(stateName, page);
       return res.json({
+        pagination,
         result: restaurants,
         success: true,
         errorMessage: null,

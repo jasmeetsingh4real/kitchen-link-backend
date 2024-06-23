@@ -28,7 +28,7 @@ restaurantRouter.post(
   RestaurantController.deleteRestaurantImage
 );
 
-restaurantRouter.get("/getAllFoodItems", RestaurantController.getAllFoodItems);
+restaurantRouter.post("/getAllFoodItems", RestaurantController.getAllFoodItems);
 
 restaurantRouter.get(
   "/getCustomCategories",

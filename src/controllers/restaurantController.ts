@@ -249,11 +249,17 @@ export class RestaurantController {
 
   static getAllFoodItems = async (req, res) => {
     try {
-      const foodItems = await RestaurantService.getAllFoodItemsByOwnerId(
-        req.userId
-      );
+      if (!req.body.page) {
+        throw new Error("PageNo. not found");
+      }
+      const { foodItems, pagination } =
+        await RestaurantService.getAllFoodItemsByOwnerId(
+          req.userId,
+          req.body.page
+        );
 
       return res.json({
+        pagination,
         result: foodItems,
         success: true,
         errorMessage: null,
