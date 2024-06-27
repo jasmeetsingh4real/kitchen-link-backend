@@ -75,3 +75,16 @@ export enum EnumOrderItemType {
   FOOD_ITEM = "food_item",
   FOOD_ITEM_OPTION = "food_item_option",
 }
+
+export enum EnumDeliveryStatus {
+  PREPARING = "preparing",
+  IN_TRANSIT = "in_transit",
+  DELIVERED = "delivered",
+  FAILED = "failed",
+}
+
+export enum EnumStaffRoles {
+  DELIVERY = "delivery",
+  ADMIN = "admin",
+  EMPLOYEE = "employee",
+}

@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 @Entity({ name: "delivery_locations" })
 export class DeliveryLocationEntity {
@@ -10,14 +16,19 @@ export class DeliveryLocationEntity {
 
   @Column()
   address: string;
+
   @Column()
   pincode: string;
+
   @Column()
   houseNo: string;
+
   @Column()
   userName: string;
+
   @Column()
   streetNo: string;
+
   @Column()
   userId: string;
 }
