@@ -40,7 +40,7 @@
     "typeorm": "typeorm-ts-node-commonjs",
     "typeorm:migrate": "npm run typeorm migration:run -d ./src/DB/datasource"
   },
-  "author": "",
+  "author": "jasmeet singh",
   "license": "ISC",
   "keywords": []
 }

@@ -19,8 +19,11 @@ export class RestaurantStaffEntity {
   staffName: string;
   @Column()
   restaurantId: string;
-  @Column()
-  role: EnumStaffRoles;
+  @Column({
+    type: "enum",
+    enum: EnumStaffRoles,
+  })
+  role: string;
   @Column()
   age: number;
   @Column()
