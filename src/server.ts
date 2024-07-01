@@ -1,10 +1,6 @@
 import app from "./app";
 import { connectDatasource } from "./db/connection";
 
-//setting up config file
-require("dotenv").config();
-console.log(process.env.PORT);
-
 //connecting to database
 connectDatasource();
 

@@ -77,7 +77,8 @@ export enum EnumOrderItemType {
 }
 
 export enum EnumDeliveryStatus {
-  PREPARING = "preparing",
+  PENDING = "pending",
+  BEING_PREPARED = "being_prepared",
   IN_TRANSIT = "in_transit",
   DELIVERED = "delivered",
   FAILED = "failed",
@@ -87,4 +88,5 @@ export enum EnumStaffRoles {
   DELIVERY = "delivery",
   ADMIN = "admin",
   EMPLOYEE = "employee",
+  CHEF = "chef",
 }

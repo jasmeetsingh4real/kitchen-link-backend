@@ -41,7 +41,7 @@ export class CreateDeliveriesTable1719507231751 implements MigrationInterface {
               EnumDeliveryStatus.DELIVERED,
               EnumDeliveryStatus.FAILED,
               EnumDeliveryStatus.IN_TRANSIT,
-              EnumDeliveryStatus.PREPARING,
+              "preparing",
             ],
           },
           {

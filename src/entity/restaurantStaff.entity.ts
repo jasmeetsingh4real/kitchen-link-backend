@@ -34,6 +34,8 @@ export class RestaurantStaffEntity {
   isActive: boolean;
   @Column()
   salary: number;
+  @Column()
+  password: string;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;

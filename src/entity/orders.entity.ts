@@ -24,6 +24,7 @@ export class OrdersEntity {
 
   @Column()
   tax: number;
+
   @Column()
   address: string;
 
