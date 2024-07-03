@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { EnumOrderStatus } from "../types/RestaurentsTypes";
 
 @Entity({ name: "orders" })
 export class OrdersEntity {
@@ -12,12 +13,6 @@ export class OrdersEntity {
     name: "id",
   })
   id: string;
-
-  @Column()
-  isFulfilled: boolean;
-
-  @Column()
-  isPaid: boolean;
 
   @Column()
   totalAmount: number;
@@ -33,6 +28,12 @@ export class OrdersEntity {
 
   @Column()
   userId: string;
+
+  @Column({
+    type: "enum",
+    enum: EnumOrderStatus,
+  })
+  status: string;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;

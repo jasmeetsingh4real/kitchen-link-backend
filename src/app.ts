@@ -4,6 +4,7 @@ import { commonRouter } from "./routes/commonRoutes";
 import { restaurantRouter } from "./routes/restaurantRoutes";
 import { verifySellerToken, verifyToken } from "./middleware/authMiddleware";
 import { userRouter } from "./routes/UserRoutes";
+import { paymentRouter } from "./routes/paymentRoutes";
 const cors = require("cors");
 
 const bodyParser = require("body-parser");
@@ -37,5 +38,7 @@ app.use("/auth", authRouter);
 app.use("/master", verifySellerToken, restaurantRouter);
 
 app.use("/user", verifyToken, userRouter);
+
+app.use("/payment", verifyToken, paymentRouter);
 
 export default app;

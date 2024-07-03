@@ -90,3 +90,20 @@ export enum EnumStaffRoles {
   EMPLOYEE = "employee",
   CHEF = "chef",
 }
+
+export enum EnumOrderStatus {
+  PENDING = "pending",
+  FAILED = "failed",
+  SUCCESSFUL = "successful",
+}
+export enum EnumTransactionStatus {
+  INITIALIZED = "initialized",
+  PENDING = "pending",
+  FAILED = "failed",
+  SUCCESS = "success",
+}
+
+export enum EnumTransactionMode {
+  UPI = "upi",
+  COD = "cod",
+}
