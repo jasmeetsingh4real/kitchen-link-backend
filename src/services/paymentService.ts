@@ -1,3 +1,4 @@
+import { deliveryProxy } from "../axios/deliveryProxy";
 import { myDataSource } from "../db/datasource/app-data-source";
 import { OrdersEntity } from "../entity/orders.entity";
 import { TransactionsEntity } from "../entity/transactions.entity";
@@ -64,5 +65,12 @@ export class PaymentService {
         status: EnumOrderStatus.SUCCESSFUL,
       }
     );
+  };
+
+  static initiateDelivery = async (data: {
+    orderId: string;
+    delivereyNotes?: string;
+  }) => {
+    await deliveryProxy("post", "/delivery/createDelivery", data);
   };
 }

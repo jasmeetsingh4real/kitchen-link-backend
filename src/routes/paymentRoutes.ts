@@ -6,3 +6,5 @@ export const paymentRouter = express.Router();
 paymentRouter.post("/initializePayment", PaymentController.initializePayment);
 
 paymentRouter.post("/verifyPayment", PaymentController.verifyPayment);
+
+paymentRouter.post("/initiateDelivery", PaymentController.initiateDelivery);

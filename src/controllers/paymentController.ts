@@ -47,6 +47,33 @@ export class PaymentController {
         req.body.orderId,
         EnumTransactionStatus.SUCCESS
       );
+
+      //initialize delivery service
+
+      return res.json({
+        result: null,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err: any) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
+  static initiateDelivery = async (req, res) => {
+    try {
+      if (!req.body.orderId) {
+        throw new Error("Order id not found");
+      }
+
+      await PaymentService.initiateDelivery({
+        orderId: req.body.orderId,
+        delivereyNotes: req.body.delivereyNotes.trim(),
+      });
+
       return res.json({
         result: null,
         success: true,
