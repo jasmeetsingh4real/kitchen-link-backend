@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { EnumOrderItemType } from "../types/RestaurentsTypes";
+import { OrdersEntity } from "./orders.entity";
 
 @Entity({ name: "order_items" })
 export class OrdersItemsEntity {
@@ -32,6 +33,9 @@ export class OrdersItemsEntity {
 
   @Column({ type: "enum", enum: EnumOrderItemType })
   itemType: string;
+
+  @ManyToOne(() => OrdersEntity, (order) => order.order_items)
+  order: OrdersEntity;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;

@@ -69,13 +69,15 @@ export class PaymentController {
         throw new Error("Order id not found");
       }
 
-      await PaymentService.initiateDelivery({
+      const response = await PaymentService.initiateDelivery({
         orderId: req.body.orderId,
-        delivereyNotes: req.body.delivereyNotes.trim(),
+        deliveryNotes: req.body.deliveryNotes.trim(),
       });
-
+      if (!response?.data?.result) {
+        throw new Error("Delivery Service is not responding");
+      }
       return res.json({
-        result: null,
+        result: response.data.result,
         success: true,
         errorMessage: null,
       });

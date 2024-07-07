@@ -69,8 +69,8 @@ export class PaymentService {
 
   static initiateDelivery = async (data: {
     orderId: string;
-    delivereyNotes?: string;
+    deliveryNotes?: string;
   }) => {
-    await deliveryProxy("post", "/delivery/createDelivery", data);
+    return deliveryProxy("post", "/delivery/createDelivery", data);
   };
 }

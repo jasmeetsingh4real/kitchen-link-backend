@@ -5,6 +5,7 @@ import { restaurantRouter } from "./routes/restaurantRoutes";
 import { verifySellerToken, verifyToken } from "./middleware/authMiddleware";
 import { userRouter } from "./routes/UserRoutes";
 import { paymentRouter } from "./routes/paymentRoutes";
+import { deliveryRouter } from "./routes/DeliveryRoutes";
 const cors = require("cors");
 
 const bodyParser = require("body-parser");
@@ -40,5 +41,7 @@ app.use("/master", verifySellerToken, restaurantRouter);
 app.use("/user", verifyToken, userRouter);
 
 app.use("/payment", verifyToken, paymentRouter);
+
+app.use("/delivery", verifyToken, deliveryRouter);
 
 export default app;
