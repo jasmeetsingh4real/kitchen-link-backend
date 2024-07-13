@@ -1,3 +1,5 @@
+import { myDataSource } from "../db/datasource/app-data-source";
+import { KitchenLinkUsersEntity } from "../entity/kitchenLinkUsers.entity";
 import { TUser } from "../schemas/UsersSchema";
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -34,5 +36,19 @@ export class AuthService {
     }
     const tokenVerified = await jwt.verify(token, process.env.JWT_SECRET_KEY);
     return tokenVerified;
+  };
+  static checkEmailValidity = async (email: string) => {
+    const usersRepo = myDataSource.getRepository(KitchenLinkUsersEntity);
+
+    const user = await usersRepo.findOne({
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      return false;
+    } else {
+      return true;
+    }
   };
 }

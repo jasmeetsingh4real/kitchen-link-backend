@@ -63,3 +63,5 @@ restaurantRouter.post(
   "/getFoodOptionsByFoodItemId",
   RestaurantController.getFoodOptionsByFoodItemId
 );
+
+restaurantRouter.post("/createStaff", RestaurantController.createStaff);

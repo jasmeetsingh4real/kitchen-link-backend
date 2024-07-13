@@ -165,6 +165,31 @@ export class AuthController {
       });
     }
   };
+
+  static checkEmailValidity = async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (email.trim()) {
+        const response = await AuthService.checkEmailValidity(email);
+        return res.json({
+          result: response,
+          success: true,
+          errorMessage: null,
+        });
+      }
+      return res.json({
+        result: false,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err: any) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
 }
 //demo token
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkYWRhd2VkYXdkYXdkdyIsInBhc3N3b3JkIjoidGVzdHVzZXIiLCJmdWxsTmFtZSI6Imphc21lZXQiLCJpYXQiOjE3MTMxMjQ1NTZ9.NfNqVJ9QC4PtdMrAB9uVtrZitM4-PQUSOlTnA_ACZ7Y=undefined; Path=/

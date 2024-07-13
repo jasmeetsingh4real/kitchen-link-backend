@@ -45,3 +45,19 @@ export const foodItemOptionSchema = z.object({
 });
 
 export type TFoodItemOption = z.infer<typeof foodItemOptionSchema>;
+
+export const restaurantStaffSchema = z.object({
+  staffName: z.string().min(1),
+  role: z.enum(["delivery", "admin", "employee", "chef"]),
+  age: z.string().min(1),
+  phoneNo: z.string().min(1),
+  email: z.string().email(),
+  isActive: z.boolean(),
+  salary: z.string().min(1),
+  password: z.string().min(1),
+});
+
+type TRestaurantStaff = z.infer<typeof restaurantStaffSchema>;
+export type TRestaurantStaffDetails = TRestaurantStaff & {
+  restaurantId: string;
+};

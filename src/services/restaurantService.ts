@@ -3,7 +3,11 @@ import { CitiesEntity } from "../entity/cities.entity";
 import { CountriesEntity } from "../entity/countries.entity";
 import { AllImagesEntity } from "../entity/allImages.entity";
 import { StatesEntity } from "../entity/states.entity";
-import { TFoodItem, TFoodItemOption } from "../schemas/RestaurantSchemas";
+import {
+  TFoodItem,
+  TFoodItemOption,
+  TRestaurantStaffDetails,
+} from "../schemas/RestaurantSchemas";
 import { FoodItemsEntity } from "../entity/foodItems.entity";
 import { CustomCategoriesEntity } from "../entity/customCategories.entity";
 import { EntityManager, Like } from "typeorm";
@@ -11,6 +15,7 @@ import { ImageService } from "./imageService";
 import { EnumImageType } from "../types/RestaurentsTypes";
 import { RestaurantEntity } from "../entity/restaurant.entity";
 import { FoodItemOptionsEntity } from "../entity/foodItemOptions.entity";
+import { RestaurantStaffEntity } from "../entity/restaurantStaff.entity";
 const fs = require("fs");
 export class RestaurantService {
   static uploadRestaurantImage = async (imageDetails: {
@@ -295,5 +300,41 @@ export class RestaurantService {
         foodItemId: id,
       },
     });
+  };
+  static createStaff = async (data: TRestaurantStaffDetails) => {
+    const restaurantStaffRepo = myDataSource.getRepository(
+      RestaurantStaffEntity
+    );
+    const existigStaff = await restaurantStaffRepo.findOne({
+      where: {
+        staffName: data.staffName,
+        restaurantId: data.restaurantId,
+      },
+    });
+    if (existigStaff) {
+      throw new Error(
+        "Staff with similar name already exists, please choose a different name."
+      );
+    }
+    await restaurantStaffRepo.save({
+      ...data,
+      age: parseInt(data.age),
+      salary: parseFloat(data.salary),
+    });
+  };
+  static getRestaurantDetailsByOwnerId = async (id: string) => {
+    if (!id) {
+      throw new Error("Owner id not found");
+    }
+    const restaurantRepo = myDataSource.getRepository(RestaurantEntity);
+    const restaurantDetails = await restaurantRepo.findOne({
+      where: {
+        ownerId: id,
+      },
+    });
+    if (!restaurantDetails) {
+      throw new Error("Restairant details not found");
+    }
+    return restaurantDetails;
   };
 }

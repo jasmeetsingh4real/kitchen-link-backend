@@ -5,6 +5,7 @@ import {
   foodItemOptionSchema,
   foodItemSchema,
   restaurantSchema,
+  restaurantStaffSchema,
 } from "../schemas/RestaurantSchemas";
 import { CountriesService } from "../services/countriesService";
 import { AllImagesEntity } from "../entity/allImages.entity";
@@ -459,6 +460,33 @@ export class RestaurantController {
         errorMessage: null,
       });
     } catch (error) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: error.message || "something went wrong",
+      });
+    }
+  };
+  static createStaff = async (req, res) => {
+    try {
+      const validateStaffData = restaurantStaffSchema.safeParse(req.body);
+      if (!validateStaffData.success) {
+        throw new Error("Invalid Data");
+      }
+
+      const restaurantDetails =
+        await RestaurantService.getRestaurantDetailsByOwnerId(req.userId);
+      await RestaurantService.createStaff({
+        ...validateStaffData.data,
+        restaurantId: restaurantDetails.id,
+      });
+
+      return res.json({
+        result: "staff created",
+        success: true,
+        errorMessage: null,
+      });
+    } catch (error: any) {
       return res.json({
         result: null,
         success: false,

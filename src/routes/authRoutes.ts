@@ -8,3 +8,4 @@ authRouter.post("/createAccount", AuthController.createUser);
 authRouter.post("/login", AuthController.loginUser);
 
 authRouter.post("/verifyAuthToken", AuthController.verifyAuthToken);
+authRouter.post("/checkEmailValidity", AuthController.checkEmailValidity);
