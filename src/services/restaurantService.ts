@@ -4,6 +4,7 @@ import { CountriesEntity } from "../entity/countries.entity";
 import { AllImagesEntity } from "../entity/allImages.entity";
 import { StatesEntity } from "../entity/states.entity";
 import {
+  restaurantStaffSchema,
   TFoodItem,
   TFoodItemOption,
   TRestaurantStaffDetails,
@@ -305,6 +306,16 @@ export class RestaurantService {
     const restaurantStaffRepo = myDataSource.getRepository(
       RestaurantStaffEntity
     );
+
+    if (data.id) {
+      await restaurantStaffRepo.update(
+        {
+          id: data.id,
+        },
+        { ...data, age: parseInt(data.age), salary: parseFloat(data.salary) }
+      );
+      return;
+    }
     const existigStaff = await restaurantStaffRepo.findOne({
       where: {
         staffName: data.staffName,
@@ -333,8 +344,40 @@ export class RestaurantService {
       },
     });
     if (!restaurantDetails) {
-      throw new Error("Restairant details not found");
+      throw new Error("Restaurant details not found");
     }
     return restaurantDetails;
+  };
+  static getRestaurantStaffs = async (resId: string) => {
+    const restaurantStaffRepo = myDataSource.getRepository(
+      RestaurantStaffEntity
+    );
+
+    const staffArr = await restaurantStaffRepo.find({
+      where: {
+        restaurantId: resId,
+      },
+    });
+
+    return staffArr;
+  };
+  static deleteStaff = async (staffId: number, ownerId: string) => {
+    const staffRepo = myDataSource.getRepository(RestaurantStaffEntity);
+    const restaurantDetails = await this.getRestaurantDetailsByOwnerId(ownerId);
+    const staffDetails = await staffRepo.findOne({
+      where: {
+        id: staffId,
+      },
+    });
+    if (!staffDetails) {
+      throw new Error("Staff not found");
+    }
+    if (staffDetails.restaurantId !== restaurantDetails.id) {
+      throw new Error("Invalid Request");
+    }
+
+    await staffRepo.delete({
+      id: staffId,
+    });
   };
 }

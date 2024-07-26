@@ -47,6 +47,7 @@ export const foodItemOptionSchema = z.object({
 export type TFoodItemOption = z.infer<typeof foodItemOptionSchema>;
 
 export const restaurantStaffSchema = z.object({
+  id: z.number().optional(),
   staffName: z.string().min(1),
   role: z.enum(["delivery", "admin", "employee", "chef"]),
   age: z.string().min(1),

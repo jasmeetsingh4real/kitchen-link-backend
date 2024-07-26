@@ -65,3 +65,9 @@ restaurantRouter.post(
 );
 
 restaurantRouter.post("/createStaff", RestaurantController.createStaff);
+
+restaurantRouter.post(
+  "/getRestaurantStaffs",
+  RestaurantController.getRestaurantStaffs
+);
+restaurantRouter.post("/deleteStaff", RestaurantController.deleteStaff);

@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { EnumStaffRoles } from "../types/RestaurentsTypes";
-import { number } from "zod";
 
 @Entity({ name: "restaurant_staff" })
 export class RestaurantStaffEntity {

@@ -214,4 +214,29 @@ export class UserService {
 
     return { OrderInfo, orderItems };
   };
+
+  static getAllOrders = async (userId: string) => {
+    const ordersRepo = myDataSource.getRepository(OrdersEntity);
+
+    const allOrders = await ordersRepo.find({
+      where: {
+        userId,
+      },
+      select: {
+        delivery: {
+          id: true,
+          status: true,
+        },
+      },
+      relations: {
+        order_items: true,
+        restaurant: true,
+        delivery: true,
+      },
+      order: {
+        createdAt: "DESC",
+      },
+    });
+    return allOrders;
+  };
 }

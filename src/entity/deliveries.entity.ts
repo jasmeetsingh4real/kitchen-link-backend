@@ -42,8 +42,8 @@ export class DeliveriesEntity {
   })
   status: string;
 
-  @OneToOne(() => OrdersEntity, (order) => order.id)
-  @JoinColumn()
+  @OneToOne(() => OrdersEntity)
+  @JoinColumn({ name: "orderId" })
   order: OrdersEntity;
 
   @CreateDateColumn({ type: "timestamp" })

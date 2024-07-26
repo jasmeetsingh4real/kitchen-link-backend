@@ -8,6 +8,7 @@ import {
 import { EnumRestaurantStatus } from "../types/RestaurentsTypes";
 import { FoodItemsEntity } from "./foodItems.entity";
 import { AllImagesEntity } from "./allImages.entity";
+import { OrdersEntity } from "./orders.entity";
 
 @Entity({ name: "restaurants" })
 export class RestaurantEntity {
@@ -59,6 +60,9 @@ export class RestaurantEntity {
     cascade: true,
   })
   images: AllImagesEntity[];
+
+  @OneToMany(() => OrdersEntity, (orders) => orders.restaurantId)
+  orders: OrdersEntity[];
 
   @Column({
     type: "enum",

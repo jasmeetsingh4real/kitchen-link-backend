@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,6 +12,7 @@ import {
 import { EnumOrderStatus } from "../types/RestaurentsTypes";
 import { DeliveriesEntity } from "./deliveries.entity";
 import { OrdersItemsEntity } from "./ordersItems.entity";
+import { RestaurantEntity } from "./restaurant.entity";
 
 @Entity({ name: "orders" })
 export class OrdersEntity {
@@ -43,8 +45,11 @@ export class OrdersEntity {
   @OneToMany(() => OrdersItemsEntity, (order_items) => order_items.order)
   order_items: OrdersItemsEntity;
 
-  @OneToOne(() => DeliveriesEntity, (delivery) => delivery.orderId)
+  @OneToOne(() => DeliveriesEntity, (delivery) => delivery.order)
   delivery: DeliveriesEntity;
+
+  @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.orders)
+  restaurant: RestaurantEntity;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;

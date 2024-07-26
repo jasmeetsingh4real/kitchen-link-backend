@@ -75,7 +75,6 @@ export class UserController {
         userId: req.userId,
         address: { ...req.body.address, userId: req.userId },
       });
-      console.log(req.body);
 
       if (!validatedOrderDetails.success) {
         throw new Error("Invalid order details");
@@ -119,6 +118,26 @@ export class UserController {
         errorMessage: null,
       });
     } catch (err) {
+      return res.json({
+        success: false,
+        errorMessage: err.message || "Something went wrong",
+        result: null,
+      });
+    }
+  };
+
+  static getAllOrders = async (req, res) => {
+    try {
+      const userId = req.userId;
+
+      const orders = await UserService.getAllOrders(userId);
+
+      return res.json({
+        result: orders,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err: any) {
       return res.json({
         success: false,
         errorMessage: err.message || "Something went wrong",

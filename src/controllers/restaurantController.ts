@@ -494,4 +494,48 @@ export class RestaurantController {
       });
     }
   };
+  static getRestaurantStaffs = async (req, res) => {
+    try {
+      const restaurantDetails =
+        await RestaurantService.getRestaurantDetailsByOwnerId(req.userId);
+
+      const StaffArr = await RestaurantService.getRestaurantStaffs(
+        restaurantDetails.id
+      );
+
+      return res.json({
+        result: StaffArr,
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err: any) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
+  static deleteStaff = async (req, res) => {
+    try {
+      const { staffId } = req.body;
+      if (!staffId) {
+        throw new Error("Staff id not recieved in req");
+      }
+
+      await RestaurantService.deleteStaff(staffId, req.userId);
+
+      return res.json({
+        result: "staff deleted",
+        success: true,
+        errorMessage: null,
+      });
+    } catch (err: any) {
+      return res.json({
+        result: null,
+        success: false,
+        errorMessage: err.message || "something went wrong",
+      });
+    }
+  };
 }
