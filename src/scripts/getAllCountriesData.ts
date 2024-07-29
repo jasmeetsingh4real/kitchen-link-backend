@@ -11,7 +11,7 @@ const myDataSource = new DataSource({
   password: "Root@123",
   database: "kitchenlinkdb",
   synchronize: false, // if true, you don't really need migrations,
-  entities: ["src/**/*.entity{.js,.ts}"],
+  entities: [CountriesEntity],
   migrations: ["src/db/datasource/migrations/*.ts"],
   logging: true,
 });
@@ -39,8 +39,8 @@ const getAllCountriesData = async () => {
     }
   );
   if (apiRes.status === 200) {
-    const res = await countriesRepo.save(apiRes.data);
-    console.log(res);
+    // const res = await countriesRepo.save(apiRes.data);
+    console.log(apiRes.data);
   }
 };
 
