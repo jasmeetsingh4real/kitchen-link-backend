@@ -179,6 +179,9 @@ export class UserService {
       where: {
         id: orderId,
       },
+      relations: {
+        restaurant: true,
+      },
     });
 
     const address: TLocation = JSON.parse(orderDetails.address);

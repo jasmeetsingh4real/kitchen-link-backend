@@ -7,7 +7,7 @@ export class DeliveryService {
 
     const deliveryDetails = await deliveryRepo.findOne({
       where: {
-        id: deiveryId,  
+        id: deiveryId,
         order: {
           userId,
         },
@@ -15,6 +15,7 @@ export class DeliveryService {
       relations: {
         order: {
           order_items: true,
+          restaurant: true,
         },
       },
     });
